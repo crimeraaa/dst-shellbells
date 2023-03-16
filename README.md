@@ -98,7 +98,7 @@ This mod is intended to be used as a way for you to make your own LUA files that
 > 
 > - I personally use Visual Studio Code. Other DST modders use Notepad++ or Sublime, those seem to be popular choices. As long as your code editor supports syntax highlighting for LUA, it should be fine!
 > 
-> 3. A basic understing of ome basic Western Music Theory concepts. 
+> 3. A basic understing of some basic Western Music Theory concepts. 
 > 
 > - Rhythms
 > 
