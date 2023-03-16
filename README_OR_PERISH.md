@@ -7,16 +7,23 @@ This mod is intended to be used as a way for you to make your own LUA files that
 
 ## I'd recommend the following:
 
-1. Having a basic grasp of syntax of the programming language LUA. 
-2. A Code Editor of some kind.
-	- I personally use Visual Studio Code. Other DST modders use Notepad++ or Sublime, those seem to be popular choices. As long as your code editor supports syntax highlighting for LUA, it should be fine!
-3. A basic understing of ome basic Western Music Theory concepts. 
-	- Rhythms
-	- Rhythmic syllable counting
-	- Sientific pitch notation
-	- Time signatures
-4. (Optional) A soul.
-5. Patience!
+> 1. Having a basic grasp of syntax of the programming language LUA. 
+> 
+> 2. A Code Editor of some kind.
+> 
+> - I personally use Visual Studio Code. Other DST modders use Notepad++ or Sublime, those seem to be popular choices. As long as your code editor supports syntax highlighting for LUA, it should be fine!
+> 
+> 3. A basic understing of ome basic Western Music Theory concepts. 
+> 
+> - Rhythms
+> 
+> - Rhythmic syllable counting
+> 
+> - Scientific pitch notation
+> - Time signatures
+> 
+> 4. (Optional) A soul.
+> 5. Patience!
  
 For the entirety of this mod I will be using the scientific pitch notation system. It uses Letter Names combined with the respective octave of the note, e.g. C4, B3, F#5 and so on. 
 
@@ -119,11 +126,11 @@ I added comments to try to explain what's going on, but let me explain it again 
 
 ## Number to Pitch Values
 
-Baritone    =   36-48, or C3-B3
-
-Alto        =   49-60, or C4-B4
-
-Soprano     =   61-72, or C5-B5
+> Baritone    =   36-48, or C3-B3
+>
+> Alto        =   49-60, or C4-B4
+>
+> Soprano     =   61-72, or C5-B5
 
 The first value each note table has is always a number value, which represents a particular pitch. Technically, pitch `C1` is number 1 and pitch `B2` is number 36, pitch `C6` is number 73. But because no shell bells are ever mapped to these sounds, they should not be used. 
 
@@ -143,14 +150,19 @@ That's literally it! It will automatically spawn the song at your cursor's posit
 
 Here is the most basic way I could think of to create your own song files.
 
-1. Create a simple mod, preferably client-only, with a barebones `modinfo.lua`. 
-2. Create a `scripts` folder under it. 
-3. Create your song file under the `scripts` folder. Let's say your song file is called `mysong.lua`
-4. Format your notes table for your song in a similar to `notetable_dsmaintheme.lua`
-5. This will involve manually remembering/referencing which pitch numbers represent which pitch values, and a bit of math to determine the distance from the starting point. 
-6. When you're finished with your song you can spawn in your song by calling `c_shellsfromtable(require("mysong"))`
+> 1. Create a simple mod, preferably client-only, with a barebones `modinfo.lua`. 
+> 
+> 2. Create a `scripts` folder under it. 
+> 
+> 3. Create your song file under the `scripts` folder. Let's say your song file is called `mysong.lua`
+> 
+> 4. Format your notes table for your song in a similar to `notetable_dsmaintheme.lua`
+> 
+> 5. This will involve manually remembering/referencing which pitch numbers represent which pitch values, and a bit of math to determine the distance from the starting point. 
+> 
+> 6. When you're finished with your song you can spawn in your song by calling `c_shellsfromtable(require("mysong"))`
 
-Another option is to directly create your song table within the game's console, but unless you have client console mods that allow you to create multiple lines, this will be very tough!
+Another option is to *directly create your song table within the game's console*, but unless you have client console mods that allow you to create multiple lines, this will be very tough!
 
 Not only that, but the system of numbers representing pitches and t values as absolute distances made it very difficult to keep track of everything. I cannot stress enough how annoying it is to constantly translate which numbers are which pitches. And although the t values aren't too bad, it requires a bit of mental work to keep track of the absolute distance as well as its place relative to the other notes. Here is an example tune, let's say it's under a mod's `scripts` folder and the file is named `tune.lua`.
 
@@ -171,7 +183,11 @@ local notes =
 return notes
 ```
     
-This took quite a bit of work for me to write, and it was only 7 notes! At least we have a song now. But for larger projects/songs, using this barebones system (in my opinion at least) would be a nightmare. So I created a whole bunch of stuff to not only help the song files makes musical sense to us, but also to make them easier to write and edit.
+> This took quite a bit of work for me to write, and it was only 7 notes! At least we have a song now. 
+> 
+> But for larger projects/songs, using this barebones system (in my opinion at least) would be a nightmare. 
+> 
+> So I created a whole bunch of stuff to not only help the song files makes musical sense to us, but also to make them easier to write and edit.
 
 
 
@@ -242,7 +258,9 @@ data.notes =
 return data
 ```
 
-The comments `-- 1ST MEASURE` and all the rhythmic syllables like `--[[1]]` and `--[[&]]` are not needed, but I recommend you put them so you can keep track of your song in terms of measures (or however you like to call them). It helps to divide the workload and if you have an error or something you'd like to change, you can first determine which measure it came from then see which note under that measure you want to access.
+> The comments `-- 1ST MEASURE` and all the rhythmic syllables like `--[[1]]` and `--[[&]]` are not needed, but I recommend you put them so you can keep track of your song in terms of measures (or however you like to call them). 
+> 
+> It helps to divide the workload and if you have an error or something you'd like to change, you can first determine which measure it came from then see which note under that measure you want to access.
 
 
 
@@ -264,7 +282,12 @@ In general the useable pitch values for shell bells are:
    
 You can add 1 accidental for each note! The code will know that string `"Bb3"` and string `"A#3"` both refer to the note number 47. `"E#"`, `"Fb"`, `"B#"` and `"Cb"` are supported pitchnames, but double sharps (e.g. `##`), double flats (e.g. `bb`) and anything above those are not. If there's enough demand I may add those, but as things are, even though I've arranged some strange music, I very very rarely encounter double accidentals or more. This is just anecdotal of course so you may encounter them way more than I do.
 
-You can actually go outside this range, provided that your entire song file **does have a total range of 3 octaves or more**. That's where the `data.transpose` value comes in. It can accept a positive or negative number of semitones which well then be added to each pitch string's associated pitch number value, effectively transposing the whole song file. You can just set `0` for `data.transpose`, heck you can even outright omit it! If there's no `data.transpose` found at all, then the code just substitutes the number `0` in its place to indicate no transposition is occuring.
+> You can actually go outside this range, provided that your entire song file **does have a total range of 3 octaves or more**. 
+> That's where the `data.transpose` value comes in. 
+> 
+> It can accept a positive or negative number of semitones which well then be added to each pitch string's associated pitch number value, effectively transposing the whole song file. 
+> 
+> You can just set `0` for `data.transpose`, heck you can even outright omit it! If there's no `data.transpose` found at all, then the code just substitutes the number `0` in its place to indicate no transposition is occuring.
 
 
 
@@ -303,9 +326,9 @@ t = "3/8" -- represents a whole bar in 3/8 time.
 
 Your song starts with an assumed distance of `0`. (in terms of DST distance units). Every duration string I accounted for represents a specific value which is then added on top of the assumed distance. The assumed distance updates with each and every Note Table.
 
-The very first Note Table is always set to distance `0`. Every other Note Table's distance value is determined by this formaula:
+The very first Note Table is always set to distance `0`. Every other Note Table's distance value is determined by this formula:
 
-(current distance) + (Previous Note Table's duration)
+> (current distance) + (Previous Note Table's duration)
 
 
 For example:
@@ -316,27 +339,26 @@ For example:
 { "E4", t = "1/8" },
 ```
 
-Pitch `"C4"` is at distance `0`. 
-    There is no Note Table before it, so it is set to 0 to be the start of the song's first measure.
+> Pitch `"C4"` is at distance `0`. 
+> There is no Note Table before it, so it is set to 0 to be the start of the song's first measure.
+> 
+> Pitch `"D4"` is at distance `0.25`.
+> The previous Note Table `"C4"` has duration 1/4 or 0.25, and distance right now is 0.
+> So our new distance = previous duration 0.25 + distance of 0
+> Our new distance for this note is 0.25, meaning:
+> Pitch `"D4"` is a 1/4th duration away from the start.
+> 
+> Pitch `"E4"` is at distance `0.375`.
+> The previous Note Table `"D4"` has duration 1/8 or 0.125, and distance right now is 0.25.
+> So our new distance = previous duration 0.125 + distance of 0.25.
+> Our new distance for this note is 0.375, meaning:
+> Pitch `"E4"` is a 1/4th + 1/8th duration away from the start.
 
-Pitch `"D4"` is at distance `0.25`.
-    The previous Note Table `"C4"` has duration 1/4 or 0.25, and distance right now is 0.
-    So our new distance = previous duration 0.25 + distance of 0
-    Our new distance for this note is 0.25, meaning:
-    Pitch `"D4"` is a 1/4th duration away from the start.
-
-Pitch `"E4"` is at distance `0.375`.
-The previous Note Table `"D4"` has duration 1/8 or 0.125, and distance right now is 0.25.
-    So our new distance = previous duration 0.125 + distance of 0.25.
-    Our new distance for this note is 0.375, meaning:
-    Pitch `"E4"` is a 1/4th + 1/8th duration away from the start.
-
-Technically you don't need to set the t value for the very last note to anything as it's never used,
-    but I think it's good practice to keep track of all your notes' rhythms.
+Technically you don't need to set the t value for the very last note to anything as it's never used, but I think it's good practice to keep track of all your notes' rhythms.
 
 ### Dotted Rhythms
 
-You can also add an asterisk `*` after the last character in each duration string to represent dotted rhythms. 
+Add an asterisk `*` after the last character in each duration string to represent dotted rhythms. 
 
 For example:
 
@@ -347,7 +369,7 @@ t = "1/8*" -- is a dotted eighth.
 
 and so on.
 
-You can do the same for double dotted notes, just use 2 asterisks instead of 1. Triple dotted notes and above are not supported.
+> You can do the same for double dotted notes, just use 2 asterisks `**` instead of 1 `*`. Triple dotted notes and above are not supported.
 
 ### Tuplets 
 
@@ -365,7 +387,7 @@ t = "[3]1/4" -- this is the downbeat which will last for 2/3 of the triplet.
 t = "[3]1/8" -- this is the upbeat which will last for 1/3 of the triplet.
 ```
 
-Triplets `[3]` up to Nonuplets `[9]` are supported for all the Basic Rhythms.
+> Triplets `[3]` up to Nonuplets `[9]` are supported for all the Basic Rhythms.
 
 These next sections involve writing LUA tables. Please follow the examples' formatting carefully.
 
@@ -386,12 +408,13 @@ data.notes =
 ```
 
 What did we just do? 
-    For the first Note Table, set its PITCH value to number `0`or string `"0"`.
-    This tells the code to ignore the pitch and not do anything with it.
-
-Pitch `0` is at distance `0` effectively.
-
-Pitch `"C4"` is 0.125. So we got distance of `0` + previous duration `"1/8"` (or 0.125). `"C4"` is a 1/8th duration away from the start.
+> For the first Note Table, set its PITCH value to number `0`or string `"0"`.
+>This tells the code to ignore the pitch and not do anything with it.
+>
+> Pitch `0` is at distance `0` effectively.
+>
+> Pitch `"C4"` is 0.125. 
+> So we got distance of `0` + previous duration `"1/8"` (or 0.125). `"C4"` is a 1/8th duration away from the start.
 
 ### For Ties:
 
@@ -408,22 +431,26 @@ data.notes =
 
 What's going on here?
 
-Pitch `"C4"` is at distance `0` as it is the very first note table.
-
-Pitch `0` is at distance `0.25`.
-    Our current distance before this note was `0`.
-    The previous Note Table's `"C4"` duration was `"1/4"`.
-    Our new distance for this note is: current distance + previous duration
-    = 0 + 0.25
-    Meaning Pitch `0` is a 1/4th duration away from the start.
-
-Pitch `"D4"` is at distance `0.375`.
-    Our current distance before this note was `0.25`.
-    The previous Note Table's (which was pitch `0`) duration was `"1/8"`.
-    Our new distance for this note is: current distance + previous duration
-    = 0.25 + 0.125
-    
-Meaning Pitch `"D4"` is a 1/4th + 1/8th duration away from the start, or equivalent to a dotted 1/4th or `"1/4*"`! Of course in *this* case you could just use a `"1/4*"` duration. But this helps you achieve super specific durations! Like...
+> Pitch `"C4"` is at distance `0` as it is the very first note table.
+>
+> Pitch `0` is at distance `0.25`.
+> 
+> Our current distance before this note was `0`.
+> The previous Note Table's `"C4"` duration was `"1/4"`.
+> Our new distance for this note is: current distance + previous duration
+> = 0 + 0.25
+> Meaning Pitch `0` is a 1/4th duration away from the start.
+> 
+> Pitch `"D4"` is at distance `0.375`.
+> 
+> Our current distance before this note was `0.25`.
+> The previous Note Table's (which was pitch `0`) duration was `"1/8"`.
+> Our new distance for this note is: current distance + previous duration
+> = 0.25 + 0.125
+> 
+> Meaning Pitch `"D4"` is a 1/4th + 1/8th duration away from the start, or equivalent to a dotted 1/4th or `"1/4*"`! 
+ 
+Of course in *this* case you could just > use a `"1/4*"` duration. But this helps you achieve super specific durations! Like...
 
 ```LUA
 data.notes =
