@@ -3,7 +3,7 @@ A way to somewhat make writing shell bell songs in Don't Starve Together (DST) a
 
 ## tl;dr, just get to the point you nerd
 
-To use this mod, simply subscribe to it on the Steam Workshop (not yet uploaded) or download this whole folder and place it within your DST mods folder. Under `scripts/songs/My Songs` (or any folder/subfolders of your choosing really, just make sure they begin at `scripts/songs/`) create a new LUA file with these something along these lines:
+To use this mod, simply subscribe to it on the Steam Workshop (not yet uploaded) or download this whole folder and place it within your DST mods folder. Under `scripts/songs/My Songs/` (or any folder/subfolders of your choosing really, just make sure they begin at `scripts/songs/`) create a new LUA file with these something along these lines:
 
 ```LUA
 local data = {}
