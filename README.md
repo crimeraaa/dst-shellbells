@@ -3,7 +3,7 @@ A way to somewhat make writing shell bell songs in Don't Starve Together (DST) a
 
 ## tl;dr, just get to the point you nerd
 
-To install this mod, simply subscribe to it on the Steam Workshop (not yet uploaded) or download it from here by clicking the green "Code" button and clicking "Download ZIP". If you download it frmo here, place and extract the ZIP file within your DST mods folder. For Windows 10, which is what I use, locally saved mods should be placed in `C:\Program Files (x86)\Steam\steamapps\common\Don't Starve Together\mods`.
+To install this mod, simply subscribe to it on the Steam Workshop (not yet uploaded) or download it from here by clicking the green "Code" button and clicking "Download ZIP". If you download it from here, place and extract the ZIP file within your DST mods folder. For Windows 10, which is what I use, locally saved mods should be placed in `C:\Program Files (x86)\Steam\steamapps\common\Don't Starve Together\mods`.
 
 Under `scripts/songs/My Songs/` (or any folder/subfolders of your choosing really, just make sure they begin at `scripts/songs/`) create a new LUA file with something along these lines:
 
@@ -86,6 +86,8 @@ c_shellsfromtable(mysongs.whiplash_comp, here, dir ,mult)
 ```
 That should be everything in a nutshell. If you didn't fully understand something, please read the in-depth breakdown.
 
+
+
 # In-depth Breakdown
 
 ## How the hell does this all even work?
@@ -100,7 +102,7 @@ This mod is intended to be used as a way for you to make your own LUA files that
 > 
 > - I personally use Visual Studio Code. Other DST modders use Notepad++ or Sublime, those seem to be popular choices. As long as your code editor supports syntax highlighting for LUA, it should be fine!
 > 
-> 3. A basic understing of some basic Western Music Theory concepts. 
+> 3. A basic understanding of some basic Western Music Theory concepts. 
 > 
 > - Rhythms
 > 
@@ -144,7 +146,12 @@ song = song or require("notetable_dsmaintheme")
     
 This works thanks to how the `or` evaluation works. Basically, it checks 2 arguments. If the 1st one is `true` (that is, there *is* an input at all that is *not* `nil`) then it will return that one. In this case if you input literally any existing global variable, string, number or whatever under the `song` parameter, then the the 2nd variable `song` (the one being declared *inside of the command, which is technically different from the one you input*) will be set to that value.
 
-However, if the 1st argument is `nil` (either by inputting nothing or flat out typing `nil`), then the evalution to move to the next argument. The second argument is `require("notetable_dsmaintheme")`. This is referring to the file of the same name, `notetable_dsmaintheme.lua` which returns its notes table upon being called with `require`. Because it's an existing input, this argument will always return anything *but* `nil` and thus will pass should this condition be reached, making the dsmaintheme the default song which is called.
+> However, if the 1st argument is `nil` (either by inputting nothing or flat out typing `nil`), then the evalution will move on to the next argument. 
+>
+> The second argument is `require("notetable_dsmaintheme")`. 
+> This is referring to the file of the same name, `notetable_dsmaintheme.lua` which returns its notes table upon being called with `require`. 
+> Because it's an existing input, this argument will always return anything *but* `nil`.
+> So this argument will always pass should this condition be reached, making the dsmaintheme the default song.
 
 The next block of code is important. 
 
@@ -155,7 +162,12 @@ if song == nil or type(song) ~= "table" then
 end
 ```
 
-Basically if variable `song` is set to something, if `song` is set to a nonexistent global variable OR it's a valid global variable that isn't a table, then the command will print the error and stop there. This is important because it establishes two things: 1) Our song file MUST be a LUA table, and 2) Our song file must be accessible within the global environment. DST Mods by default have their own separate environment, so mod global variables in a DST mod can't actually be accessed with the ingame console. This can be averted by explicitly declaring a variable to be GLOBAL within your mod, or setting the mod's environment to GLOBAL.
+Basically if variable `song` is set to something, if `song` is set to a nonexistent global variable OR it's a valid global variable that isn't a table, then the command will print the error and stop there. This is important because it establishes two things: 
+
+1. Our song file MUST be a LUA table. 
+2. Our song file must be accessible within the global environment. 
+ 
+DST Mods by default have their own separate environment, so mod global variables in a DST mod can't actually be accessed with the ingame console. This can be averted by explicitly declaring a variable to be GLOBAL within your mod, or setting the mod's environment to GLOBAL.
 
 To explain how my mod works and why I made it, let's see what `notetable_dsmaintheme.lua` is all about! This is, in my opinion, very important to understand as it's how shell bell songs are created at all. I'll discuss the other parameters much much later.
 
@@ -213,13 +225,13 @@ I added comments to try to explain what's going on, but let me explain it again 
 
 ## Number to Pitch Values
 
-> Baritone    =   36-48, or C3-B3
+> Baritone    =   37-48, or C3-B3
 >
 > Alto        =   49-60, or C4-B4
 >
 > Soprano     =   61-72, or C5-B5
 
-The first value each note table has is always a number value, which represents a particular pitch. Technically, pitch `C1` is number 1 and pitch `B2` is number 36, pitch `C6` is number 73. But because no shell bells are ever mapped to these sounds, they should not be used. 
+The first value each note table has is always a number value, which represents a particular pitch. Technically, pitch `C1` is number 1 and pitch `B2` is number 36, pitch `C6` is number 73. But because no shell bells are ever mapped to these sounds, any and all values outside of the range 37-72 should not be used. 
 
 
 
@@ -292,7 +304,7 @@ Let's start by creating a song file. I've already included a `template.lua` file
 
 Let's say I'm creating a file under the `scripts/songs/My Songs/` folder called `thelick.lua`.
 
-We'll start by declaring a local variable `data` and assigning an empty table to it. Then we'll create "keys" (which are similar to indexes) to represent different information of our song. These should be the first few lines in your songfile:
+We'll start by declaring a local variable `data` and assigning an empty table to it. Then we'll create "keys" to represent different information of our song. Keys are important in LUA, because they're similar to indexes, but you can assign non-numeric values to them like strings! Anyway, these should be the format of your first few lines in your songfile:
 
 ```LUA
 local data = {}
@@ -304,7 +316,7 @@ data.notes =
 }
 ```
 
-What we did here is create an empty table called `data`, and assigned several keys to it. `data.title` should be assigned to a string value which represents, well, the title of your song. This is actually meant to be a *variable* which you can call later on in the ingame console. So for your ease I'd recommend the following:
+We created the empty table `data` and assigned several keys to it. `data.title` should be assigned to a string value which represents, well, the title of your song. This is actually meant to be a *variable* which you can call later on in the ingame console. So for your ease I'd recommend the following:
 
 1. Do not use any special characters like dots `.` and hastags `#`.
 2. Use underscores `_` instead of spaces.
@@ -369,7 +381,7 @@ In general the useable pitch values for shell bells are:
    
 You can add 1 accidental for each note! The code will know that string `"Bb3"` and string `"A#3"` both refer to the note number 47. `"E#"`, `"Fb"`, `"B#"` and `"Cb"` are supported pitchnames, but double sharps (e.g. `##`), double flats (e.g. `bb`) and anything above those are not. If there's enough demand I may add those, but as things are, even though I've arranged some strange music, I very very rarely encounter double accidentals or more. This is just anecdotal of course so you may encounter them way more than I do.
 
-> You can actually go outside this range, provided that your entire song file **does have a total range of 3 octaves or more**. 
+> You can actually go outside this range, provided that your entire song file **does NOT have a total range of 3 octaves or more**. 
 > That's where the `data.transpose` value comes in. 
 > 
 > It can accept a positive or negative number of semitones which well then be added to each pitch string's associated pitch number value, effectively transposing the whole song file. 
