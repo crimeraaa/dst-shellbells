@@ -205,7 +205,7 @@ local notes =   -- create a table called notes.
 return notes    -- at the very end return the notes table. this is later called with `require("notetable_dsmaintheme)` for the default song parameter.
 ```
 
-I added comments to try to explain what's going on, but let me explain it again here if it's note clear. The file starts out by creating a table called `notes`. Under the `notes` table, we have many more tables within its scope. Each of these tables, or as I prefer to call them "individual note tables", contain two things. 
+I added comments to try to explain what's going on, but let me explain it again here if it's not clear. The file starts out by creating a table called `notes`. Under the `notes` table, we have many more tables within its scope. Each of these tables, or as I prefer to call them "individual note tables", contain two things. 
 
 
 
@@ -223,7 +223,7 @@ The first value each note table has is always a number value, which represents a
 
 ## The "t" values
 
-The second value each note table has a `t = (number)` value. This actually represents distance away from the starting point, which is by default your cursor's position. It's a way to loosely map "time" for lack of better word. There is no standardization here and this file is actually quite confusing to me because I can't see a pattern in the values immediately. But I can tell you this tune is in 3/4 time, in the key of G Minor. If we simply used
+The second value each note table has a `t = (number)` value. This actually represents distance away from the starting point, which is by default your cursor's position. It's a way to loosely map "time" for lack of better word. There is no standardization here and this file is actually quite confusing to me because I can't see a pattern in the values immediately. But I can tell you this tune is in 3/4 time, in the key of G Minor. 
 
 To spawn `notetable_dsmaintheme`, simply type `c_shellsfromtable()` as is, in the console.
 
