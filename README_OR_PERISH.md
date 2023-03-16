@@ -236,6 +236,8 @@ In general the useable pitch values for shell bells are:
 	C4, D4, E4, F4, G4, A4, B4, -- this octave is Middle C on the piano.
 	C5, D5, E5, F5, G5, A5, B5, -- this octave is High C, an octave above Middle C on the piano.
    
+You can add 1 accidental for each note! The code will know that string `"Bb3"` and string `"A#3` both refer to the note number 47. `"E#"`, `"Fb"`, `"B#"` and `"Cb"` are supported pitchnames, but double sharps (e.g. `##`), double flats (e.g. `bb`) and anything above those are not. If there's enough demand I may add those, but as things are, even though I've arranged some strange music, I very very rarely encounter double accidentals or more. This is just anecdotal of course so you may encounter them way more than I do.
+
 You can actually go outside this range, provided that your entire song file **does have a total range of 3 octaves or more**. That's where the `data.transpose` value comes in. It can accept a positive or negative number of semitones which well then be added to each pitch string's associated pitch number value, effectively transposing the whole song file. You don't actually need to specify anything for `data.transpose`, heck you can even outright omit it! If there's nothing found for it then the code just substitutes the number `0` in its place to indicate no transposition is occuring.
 
 
