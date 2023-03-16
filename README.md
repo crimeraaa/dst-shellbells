@@ -48,9 +48,13 @@ dir["My Songs"] =
 	"mysongfilename",
 }
 ```
-> In general I'd recommend you to store your own songfiles under the `scripts/songs/My Songs` folder. However, if you choose to use a different folder or use a subfolder within another folder, then be sure to declare the correct path.
+> In general I'd recommend you to store your own songfiles under the `scripts/songs/My Songs` folder. However, if you choose to use a different folder or use a subfolder within another folder, then be sure to declare the correct folder path first.
 >
-> DST's code typically uses forward `/` slashes for filepaths. If you have a folder `scripts/songs/My Songs/Rock/` for example, then create a new table like `dir["My Songs/Rock"]` without the final forward slash, as my code automatically appends that.
+> DST's code typically uses forward `/` slashes for filepaths. If you have a new folder like `scripts/songs/My Songs/Rock/` for example, then create a new table `dir["My Songs/Rock"]` without the ending forward `/` slash.
+> 
+> My code assumes your folder's path begins at `songs/`, and will always append a forward `/` slash at the end of your folder's path. 
+> 
+> `scripts/` is not specified in the folder's path as I loop through the declared folder paths and call the `require` function. In DST, `require` always begins its search in the `scripts` folder. 
 
 After declaring your song, assuming everything went well, you can now call your songs by indexing the global table `mysongs` using the `data.title` string as the key. For example, `mysongs.examplesong`. 
 
