@@ -11,7 +11,7 @@ I'd recommend the following:
 2. A Code Editor.
 3. A basic understing of ome basic Western Music Theory concepts. (rhythms, rhythmic syllable counting, scientific pitch notation, time signatures)
  
-For the entirety of this mod I will be using the scientific pitch notation system. It uses Letter Names combined with the respective octave of the note, e.g. C4, B3, F#5 and so on. I will also be using the American way of naming note durations such as "whole note", "half note", "quarter note" and so on as that's what I know best. Lastly, I'd encourage
+For the entirety of this mod I will be using the scientific pitch notation system. It uses Letter Names combined with the respective octave of the note, e.g. C4, B3, F#5 and so on. I will also be using the American way of naming note durations such as "whole note", "half note", "quarter note" and so on as that's what I know best. Lastly, I'd encourage you to use some sort of counting system. I personally use the system that uses a mix of numbers are simple syllables. Such as "1 e and uh 2 e and uh 3 e and uh 4 e and uh" for sixteenth note subdivisions, which I personally spell as "1 e & a 2 e & a 3 e & a". Triplets are "1 & a 2 & a 3 & a 4 & a".
 
 
 
