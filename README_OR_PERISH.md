@@ -10,6 +10,8 @@ I'd recommend the following:
 1. Having a basic grasp of LUA syntax.
 2. A Code Editor.
 3. A basic understing of ome basic Western Music Theory concepts. (rhythms, rhythmic syllable counting, scientific pitch notation, time signatures)
+4. (Optional) A soul.
+5. Patience!
  
 For the entirety of this mod I will be using the scientific pitch notation system. It uses Letter Names combined with the respective octave of the note, e.g. C4, B3, F#5 and so on. 
 
@@ -99,7 +101,9 @@ I added comments to try to explain what's going on, but let me explain it again 
 # Number to Pitch Values
 
 Baritone    =   36-48, or C3-B3
+
 Alto        =   49-60, or C4-B4
+
 Soprano     =   61-72, or C5-B5
 
 The first value each note table has is always a number value, which represents a particular pitch. Technically, pitch C1 is number 1 and pitch B2 is number 36, pitch C6 is number 73. But because no shell bells are ever mapped to these sounds, they should not be used. 
@@ -152,7 +156,7 @@ This took quite a bit of work for me to write, and it was only 7 notes! At least
 
 # CUSTOM SONG FILES
 
-Finally, this nerd is done explaining some dumb nerd stuff! Let's get to the actual good part! /s
+Finally, this nerd is done explaining some dumb nerd stuff! Let's get to the actual good part! 
 
 But really I wanted to explain how the original note table was created so we can have an idea of why I'm doing things the way I do. It's also because what my mod is doing is really just taking your song file input and translating that to another table in the previous format which the game can spawn in! This mod is just a way for us to make more immediately readable music that doesn't require us to constantly translate numbers to pitches or the keep track of absolute time ourselves.
 
