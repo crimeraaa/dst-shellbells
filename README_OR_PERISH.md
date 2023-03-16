@@ -106,7 +106,7 @@ Alto        =   49-60, or C4-B4
 
 Soprano     =   61-72, or C5-B5
 
-The first value each note table has is always a number value, which represents a particular pitch. Technically, pitch C1 is number 1 and pitch B2 is number 36, pitch C6 is number 73. But because no shell bells are ever mapped to these sounds, they should not be used. 
+The first value each note table has is always a number value, which represents a particular pitch. Technically, pitch `C1` is number 1 and pitch `B2` is number 36, pitch `C6` is number 73. But because no shell bells are ever mapped to these sounds, they should not be used. 
 
 
 
@@ -223,11 +223,11 @@ The comments `-- 1ST MEASURE` and all the rhythmic syllables like `--[[1]]` and 
 
 # Pitch Values
 
-The left value in each note table is the "PITCH" value. Instead of using good old numbers 37-72, we can use strings! In general all pitches from C3-B5 are accepted. You can actually use numbers and I'm (fiarly) certain it will work fine. But I greatly prefer to strings as they communicate the relevant musical information to me much quicker and I haven't tested it enough, I also recommend *against* using it just because of how unreadable it can be.
+The left value in each note table is the `"PITCH"` value. Instead of using good old numbers 37-72, we can use strings! In general all pitches from C3-B5 are accepted. You can actually use numbers and I'm (fairly) certain it will work fine. But I greatly prefer to strings as they communicate the relevant musical information to me much quicker and I haven't tested it enough, I also recommend *against* using it just because of how unreadable it can be.
 
 Should you use a string, make sure it contains the note's letter name along wwith its respective octave. This is the Scientific Pitch Notation system! I encourage you to read about it so this makes more sense. 
 
-String "C4" will represent middle C, for example. "B3" will represent the B natural right below Middle C.
+String `"C4"` will represent middle C, for example. string `"B3"` will represent the B natural right below Middle C.
 The octave number change for every new C. 
 
 In general the useable pitch values for shell bells are: 
@@ -236,7 +236,7 @@ In general the useable pitch values for shell bells are:
 	C4, D4, E4, F4, G4, A4, B4, -- this octave is Middle C on the piano.
 	C5, D5, E5, F5, G5, A5, B5, -- this octave is High C, an octave above Middle C on the piano.
    
-You can add 1 accidental for each note! The code will know that string `"Bb3"` and string `"A#3` both refer to the note number 47. `"E#"`, `"Fb"`, `"B#"` and `"Cb"` are supported pitchnames, but double sharps (e.g. `##`), double flats (e.g. `bb`) and anything above those are not. If there's enough demand I may add those, but as things are, even though I've arranged some strange music, I very very rarely encounter double accidentals or more. This is just anecdotal of course so you may encounter them way more than I do.
+You can add 1 accidental for each note! The code will know that string `"Bb3"` and string `"A#3"` both refer to the note number 47. `"E#"`, `"Fb"`, `"B#"` and `"Cb"` are supported pitchnames, but double sharps (e.g. `##`), double flats (e.g. `bb`) and anything above those are not. If there's enough demand I may add those, but as things are, even though I've arranged some strange music, I very very rarely encounter double accidentals or more. This is just anecdotal of course so you may encounter them way more than I do.
 
 You can actually go outside this range, provided that your entire song file **does have a total range of 3 octaves or more**. That's where the `data.transpose` value comes in. It can accept a positive or negative number of semitones which well then be added to each pitch string's associated pitch number value, effectively transposing the whole song file. You don't actually need to specify anything for `data.transpose`, heck you can even outright omit it! If there's nothing found for it then the code just substitutes the number `0` in its place to indicate no transposition is occuring.
 
