@@ -17,7 +17,7 @@ For the entirety of this mod I will be using the scientific pitch notation syste
 
 I will also be using the American way of naming note durations such as "whole note", "half note", "quarter note" and so on as that's what I know best. 
 
-Lastly, I'd encourage you to use some sort of counting system. I personally use the system that uses a mix of numbers are simple syllables. 
+Lastly, I'd encourage you to use some sort of counting system. I personally use the system that uses a mix of numbers and simple syllables. 
 
 	Such as "1 e and uh 2 e and uh 3 e and uh 4 e and uh" for 16th note subdivisions.
 	I personally spell the above as "1 e & a 2 e & a 3 e & a". 		
