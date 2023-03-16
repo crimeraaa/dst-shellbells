@@ -11,7 +11,15 @@ I'd recommend the following:
 2. A Code Editor.
 3. A basic understing of ome basic Western Music Theory concepts. (rhythms, rhythmic syllable counting, scientific pitch notation, time signatures)
  
-For the entirety of this mod I will be using the scientific pitch notation system. It uses Letter Names combined with the respective octave of the note, e.g. C4, B3, F#5 and so on. I will also be using the American way of naming note durations such as "whole note", "half note", "quarter note" and so on as that's what I know best. Lastly, I'd encourage you to use some sort of counting system. I personally use the system that uses a mix of numbers are simple syllables. Such as "1 e and uh 2 e and uh 3 e and uh 4 e and uh" for sixteenth note subdivisions, which I personally spell as "1 e & a 2 e & a 3 e & a". Triplets are "1 & a 2 & a 3 & a 4 & a".
+For the entirety of this mod I will be using the scientific pitch notation system. It uses Letter Names combined with the respective octave of the note, e.g. C4, B3, F#5 and so on. 
+
+I will also be using the American way of naming note durations such as "whole note", "half note", "quarter note" and so on as that's what I know best. 
+
+Lastly, I'd encourage you to use some sort of counting system. I personally use the system that uses a mix of numbers are simple syllables. 
+
+	Such as "1 e and uh 2 e and uh 3 e and uh 4 e and uh" for 16th note subdivisions.
+	I personally spell the above as "1 e & a 2 e & a 3 e & a". 		
+	Triplets are "1 & a 2 & a 3 & a 4 & a". So on and so forth.
 
 
 
@@ -19,7 +27,7 @@ For the entirety of this mod I will be using the scientific pitch notation syste
 
 Let's start from the very top. What is this mod even going to be used in? How does the shell bell song file even originally work? There's a console command (defined under, well, the base game's `scripts/consolecommands.lua`) which lets you spawn in shell bell songs. The command goes as follows:
 
-`c_shellsfromtable(song, startpos, placementfn, spacing_multiplier, out_of_range_mode)`
+`c_shellsfromtable(song, startpos, placementfn, spacing_multiplier)`
 
 Parameter `song` should be a LUA `table ` of subtables. By default, if you don't input anything for this parameter, it will default to `notetable_dsmaintheme`. That's because of this line for the definition of `c_shellsfromtable`:
 
@@ -38,7 +46,7 @@ The next block of code is important.
 
 Basically if variable `song` is set to something, if `song` is set to a nonexistent global variable OR it's a valid global variable that isn't a table, then the command will print the error and stop there. This is important because it establishes two things: 1) Our song file MUST be a LUA table, and 2) Our song file must be accessible within the global environment. DST Mods by default have their own separate environment, so mod global variables in a DST mod can't actually be accessed with the ingame console. This can be averted by explicitly declaring a variable to be GLOBAL within your mod, or setting the mod's environment to GLOBAL.
 
-To explain how my mod works and why I made it, let's see what `notetable_dsmaintheme` is all about!
+To explain how my mod works and why I made it, let's see what `notetable_dsmaintheme` is all about! This is, in my opinion, very important to understand as it's how shell bell songs are created at all. I'll discuss the other parameters much much later.
 
     local notes =   -- create a table called notes.
     {
@@ -170,8 +178,8 @@ We'll start by declaring a local variable `data` and assigning an empty table to
 
 What we did here is create an empty table called `data`, and assigned several keys to it. `data.title` should be assigned to a string value which represents, well, the title of your song. This is actually meant to be a *variable* which you can call later on in the ingame console. So for your ease I'd recommend the following:
 
-1. Do not use any special characters like dots (`.`) and hastags (`#`).
-2. Use underscores (`_`) instead of spaces.
+1. Do not use any special characters like dots `.` and hastags `#`.
+2. Use underscores `_` instead of spaces.
 
 The reason for the above is because later on, your song file is actually inserted into a global table called `mysongs` with the `data.title` value as the key for your song. You can index that table to reach your song, assuming it compiled properly.
 
@@ -179,7 +187,7 @@ For example, later on I can call this song through `c_shellsfromtable(mysongs.th
 
 If your `data.title` is, say `data.title = "#The Lick!"` then you can't call it through `c_shellsfromtable(mysongs.#The Lick!)` because LUA can't index a string with spaces/special characters like that, it'll result in an error if you do. If you do uses spaces and/or special characters, do this: `c_shellsfromtable(mysongs["#The Lick!])`. 
 
-Both using the dot (`.`) and the square brackets (`[]`) to index the table `mysongs` are valid, but it may be a bit tricky knowing that the dot already assumes the key following it is a string. With the square brackets you have to explicitly put quotation marks (`""`) to tell the code that you're trying to index a key that's a string.
+Both using the dot `.` and the square brackets `[]` to index the table `mysongs` are valid, but it may be a bit tricky knowing that the dot already assumes the key following it is a string. With the square brackets you have to explicitly put quotation marks `""` to tell the code that you're trying to index a key that's a string.
 
 
 
@@ -226,13 +234,13 @@ In general the useable pitch values for shell bells are:
     C4, D4, E4, F4, G4, A4, B4, -- this octave is Middle C on the piano.
     C5, D5, E5, F5, G5, A5, B5, -- this octave is High C, an octave above Middle C on the piano.
    
-You can actually go outside this range, provided that your entire song file **does have a total range of 3 octaves or more**. That's where the `data.transpose` value comes in. It can accept a positive or negative number of semitones which well then be added to each pitch string's associated pitch number value, effectively transposing the whole song file.
+You can actually go outside this range, provided that your entire song file **does have a total range of 3 octaves or more**. That's where the `data.transpose` value comes in. It can accept a positive or negative number of semitones which well then be added to each pitch string's associated pitch number value, effectively transposing the whole song file. You don't actually need to specify anything for `data.transpose`, heck you can even outright omit it! If there's nothing found for it then the code just substitutes the number `0` in its place to indicate no transposition is occuring.
 
 
 
 # Rhytmic Values
 
-The right value in your note table is still the "t" value, but you can using a string to represent various durations! It contains the note's intended duration in terms of a fraction of a whole note.
+The right value in your note table is still the `t` value, but you can using a string to represent various durations! It contains the note's intended duration in terms of a fraction of a whole note.
 
 The Basic Rhythms are:
     
@@ -260,9 +268,9 @@ Of note are:
 
 # Simplified breakdown of how t values are converted
 
-Your song starts with an assumed distance of 0. (in terms of DST distance units). Every duration string I accounted for represents a specific value which is then added on top of the assumed distance. The assumed distance updates with each and every Note Table.
+Your song starts with an assumed distance of `0`. (in terms of DST distance units). Every duration string I accounted for represents a specific value which is then added on top of the assumed distance. The assumed distance updates with each and every Note Table.
 
-The very first Note Table is always set to distance 0. Every other Note Table's distance value is determined by this formaula:
+The very first Note Table is always set to distance `0`. Every other Note Table's distance value is determined by this formaula:
 
 (current distance) + (Previous Note Table's duration)
 
@@ -273,17 +281,17 @@ For example:
     { "D4", t = "1/8" }, 
     { "E4", t = "1/8" },
 
-Pitch "C4" is at distance 0. 
+Pitch `"C4"` is at distance `0`. 
     There is no Note Table before it, so it is set to 0 to be the start of the song's first measure.
 
-Pitch "D4" is at distance 0.25.
-    The previous Note Table (C4) has duration 1/4 or 0.25, and distance right now is 0.
+Pitch `"D4"` is at distance `0.25`.
+    The previous Note Table `"C4"` has duration 1/4 or 0.25, and distance right now is 0.
     So our new distance = previous duration 0.25 + distance of 0
     Our new distance for this note is 0.25, meaning:
-    Pitch "D4" is a 1/4th duration away from the start.
+    Pitch `"D4"` is a 1/4th duration away from the start.
 
-Pitch "E4" is at distance 0.375.
-The previous Note Table ("D4") has duration 1/8 or 0.125, and distance right now is 0.25.
+Pitch `"E4"` is at distance `0.375`.
+The previous Note Table `"D4"` has duration 1/8 or 0.125, and distance right now is 0.25.
     So our new distance = previous duration 0.125 + distance of 0.25.
     Our new distance for this note is 0.375, meaning:
     Pitch "E4" is a 1/4th + 1/8th duration away from the start.
@@ -291,7 +299,7 @@ The previous Note Table ("D4") has duration 1/8 or 0.125, and distance right now
 Technically you don't need to set the t value for the very last note to anything as it's never used,
     but I think it's good practice to keep track of all your notes' rhythms.
 
-You can also add an asterisk (`*`) after the last character in each duration string to represent dotted rhythms. 
+You can also add an asterisk `*` after the last character in each duration string to represent dotted rhythms. 
 
 For example:
 
@@ -302,7 +310,7 @@ and so on.
 
 You can do the same for double dotted notes, just use 2 asterisks instead of 1. Triple dotted notes and above are not supported.
 
-What about triplets and other tuplets? To do so, first enclose the number of the tuplet you'd like in brackets (`[]`) like so:
+What about triplets and other tuplets? To do so, first enclose the number of the tuplet you'd like in brackets `[]` like so:
 
     t = "[3]1/4" is a triplet quarter note. 
     This is especially useful in approximating music with a swing eighths feel.
@@ -312,7 +320,7 @@ Swung 8ths would look like this:
     t = "[3]1/4", this is the downbeat which will last for 2/3 of the triplet.
     t = "[3]1/8", this is the upbeat which will last for 1/3 of the triplet.
 
-Triplets, or (`[3]`), up to Nonuplets (`[9]`) are supported for all the Basic Rhythms.
+Triplets, or `[3]`, up to Nonuplets `[9]` are supported for all the Basic Rhythms.
 
 These next sections involve writing LUA tables. Please follow the examples' formatting carefully.
 
@@ -331,9 +339,9 @@ What did we just do?
     For the first Note Table, set its PITCH value to number `0`or string `"0"`.
     This tells the code to ignore the pitch and not do anything with it.
 
-Pitch 0 is at distance 0 effectively.
+Pitch `0` is at distance `0` effectively.
 
-Pitch `"C4"` is 0.125. So we got distance of 0 + previous duration 1/8 (or 0.125). `"C4"` is a 1/8th duration away from the start.
+Pitch `"C4"` is 0.125. So we got distance of `0` + previous duration `"1/8"` (or 0.125). `"C4"` is a 1/8th duration away from the start.
 
 For Ties:
 
@@ -345,11 +353,11 @@ It's a similar idea to Rests, but instead of putting the dummy note table BEFORE
 
 What's going on here?
 
-Pitch `"C4"` is at distance 0 as it is the very first note table.
+Pitch `"C4"` is at distance `0` as it is the very first note table.
 
 Pitch `0` is at distance `0.25`.
     Our current distance before this note was `0`.
-    The previous Note Table's ("C4") duration was `"1/4"`.
+    The previous Note Table's `"C4"` duration was `"1/4"`.
     Our new distance for this note is: current distance + previous duration
     = 0 + 0.25
     Meaning Pitch `0` is a 1/4th duration away from the start.
@@ -360,13 +368,13 @@ Pitch `"D4"` is at distance `0.375`.
     Our new distance for this note is: current distance + previous duration
     = 0.25 + 0.125
     
-Meaning Pitch `"D4"` is a 1/4th + 1/8th duration away from the start, or equivalent to a dotted 1/4th! (`"1/4*"`) Of course in *this* case you could just use a `"1/4*"` duration. But this helps you achieve super specific durations! Like...
+Meaning Pitch `"D4"` is a 1/4th + 1/8th duration away from the start, or equivalent to a dotted 1/4th or `"1/4*"`! Of course in *this* case you could just use a `"1/4*"` duration. But this helps you achieve super specific durations! Like...
 
     { "C4", t = "1/4" }, 
     { 0,    t = "1/16"}, 
     { "D4", t = "1/8*"}, 
 
-We effectively turned pitch `"C4"` into a "1/4" + "1/16" duration, meaning the next nonzero pitch will be that duration away from pitch `"C4"`. In this case the next nonzero pitch is pitch `"D4"`, so it will be "1/4" + "1/16" duration away from pitch `"C4"`, or distance (0.25 + 0.0625, or 0.3125) away from the start. Why use this? Because no sane duration in Western Music Theory is in itself equivalent to 1/4 + 1/16th, thus we have to combine 2 basic durations to get that value. You could probably do something dumb like a very obscure quarter tuplet for this, but at that point why *don't* you jut tie the note?
+We effectively turned pitch `"C4"` into a "1/4" + "1/16" duration, meaning the next nonzero pitch will be that duration away from pitch `"C4"`. In this case the next nonzero pitch is pitch `"D4"`, so it will be "1/4" + "1/16" duration away from pitch `"C4"`, or distance (0.25 + 0.0625, or 0.3125) away from the start. Why use this? Because no sane duration in Western Music Theory is in itself equivalent to 1/4 + 1/16th, thus we have to combine 2 basic durations to get that value. You could probably do something strange like a very obscure quarter tuplet for this, but at that point why *don't* you jut tie the note?
 
 
 
@@ -412,4 +420,204 @@ Assuming your song is located under the folder `scripts/songs/My Songs/`, simply
 	    "thelick",	-- look mom! i did it!
 	}
 	
-No need for the `.lua` extension. After all this, assuming everything went well with no errors, you should be able to call yoursong ingame! If this file `scripts/songs/My Songs/thelick.lua` did exist, then I could call it with `c_shellsfromtable(mysongs.thelick)`!
+No need for the `.lua` extension. After all this, assuming everything went well with no errors, you should be able to call your song ingame! If this file `scripts/songs/My Songs/thelick.lua` did exist, then I could call it with `c_shellsfromtable(mysongs.thelick)`!
+
+# THE OTHER PARAMETERS
+
+Obviously simply spawning in your song directly isn't enough. It's incredibly likely the distances are too short, or it spawned in the wrong direction, or you want it to start at a very specific location. I have a few functions to accomodate for those.
+
+For reference, this is what the command accepts again:
+
+	c_shellsfromtable(song, startpos, placementfn, spacing_mult)
+	
+# startpos
+
+As its variable name suggests, startpos is the exact position when your song starts. If you don't input anything for it or flat out type `nil`, it'll default to your cursor's position. To declare a custom startpos you need a table with 3 values, each with the keys `x`, `y`, and `z`. Like:
+
+	c_shellsfromtable(mysongs.thelick, { x = 90, y = 0, z = -300 })
+	
+The keys specifically must be x,y and z. I forgot why but that's just how it is. Generally your `y` value should be 0 as most of the game occurs on the same "elevation", for lack of better word. Instead of creating a coordinates table inside the function call, why don't we use a variable? The ingame console is basically a LUA compiler after all.
+
+	local coords = { x = 90, y = 0, z = -300 }
+	c_shellsfromtable(mysongs.thelick, coords)
+	
+Nice and simple! This also has the added benefit of allowing you to call `coords` for the `startpos` of multiple songs at the same time, instead of manually writing the table over and over again.
+
+But one little gripe I have is that I hate having to type the `x`, `y` and `z` keys manually! This is especially frustrating during testing when I was spawning a LOT of songs and had to determine the coordinates very frequently. So I created 2 functions that automatically returns a table with 3 values set to keys of `x`, `y` or `z`.
+
+	function PlayerPos(player_num) -- if no input for player_num, it will default to you.
+		local player = AllPlayers[player_num] or ThePlayer
+		local coords = {}
+		coords.x, coords.y, coords.z = player.Transform:GetWorldPosition()
+		return coords
+	end
+
+	function Coords(x,y,z) -- quickly create a table of coordinates with x y z as the keys!
+	    local coords = {}
+	    y = y or 0
+	    if (x == nil or z == nil) then -- if no input for x or z, 
+		return nil  -- startpos will default to the coordinates under your cursor.
+	    else
+		coords.x, coords.y, coords.z = x,y,z 
+		return coords
+	    end
+	end	
+	
+	
+	
+# PlayerPos(num)
+
+The function `PlayerPos(player_num)` gets the position of a player and returns a table of those coordinates. The reason we can't just use `ThePlayer.Transform:GetWorldPosition` is because it just returns 3 numbers! 
+
+If you did something like `local here = { ThePlayer.Transform:GetWorldPosition) }` then you'll have a table with keys 1, 2 and 3. That's where this function comes in. 
+
+If you simply call `PlayerPos()` then it'll return a table of coordinates of your current position. This can be handy for spawning shell bell songs right on top of you. 
+
+You can also call `PlayerPos(num)` where `num` is a player number of someone on the server. If you're confused, hit the `TAB` key while playing in a world to see which players are assigned to which numbers.
+
+You can fine tune the coordinates by declaring a variable, then applying simple math operations to each key and overwriting that key. Like so:
+
+	local here = PlayerPos()
+	here.x = here.x - 30
+	here.z = here.z + 15
+
+Or you can even just declare a new value for them!
+
+	local here = PlayerPos()
+	here.x = 100
+	here.z = -200
+	
+# Coords(x,y,z)
+The function `Coords(x,y,z)` allows for a very fine tuning of coordinates. It takes 3 inputs and assigns them each to the respective coordinate value and returns those coordinate values in a table with x,y,z keys. 
+
+For example I can say `local here = Coords(90, 0, -300)` and `here` will automatically be a table with those 3 values set to `x`, `y` and `z` keys respecitvely! I can then call the local table `here` for the `startpos` parameter like so:
+
+	local here = Coords(90, 0, -300)
+	c_shellsfromtable(mysongs.thelick, here)
+	
+Just like `PlayerPos()`, if you set a local variable which calls and runs this function you can manipulate the keys!
+
+	local here = Coords(100, 0, 300)
+		here.x = here.x - 30
+		here.z = here.z + 15
+
+Again, you can also just declare a new value for them.
+
+	local here = Coords(100, 0, 300)
+		here.x = 150
+		here.z = -200
+		
+This is especially handy when you're spawning in multiple songs but you can to separate them a bit. For example here is what I did for my arrangement of "Whiplash":
+
+	local here = Coords(400, 0, -326)	-- center line
+	local dir = NW
+	local mult = 5
+	c_shellsfromtable(mysongs.whiplash_melody, here, dir, mult)
+	here.z = -325 -- left side
+	c_shellsfromtable(mysongs.whiplash_bass, here, dir, mult)
+	here.z = -327 -- right side
+	c_shellsfromtable(mysongs.whiplash_bass, here, dir, mult)
+	
+You may be confused about the `local dir = NW` and `local mult = 5`. I'm just about to get into that!
+
+# placementfn
+
+`placementfn` is a function that determines the way your shells are lined up. Here's how it's defined under `consolecommands.lua`:
+
+	placementfn = placementfn or function(currentpos, multiplier)
+		-- Default placementfn spawns shells in a straight line along world x
+		return Vector3( currentpos.x - 1 * multiplier, 0, currentpos.z)
+	end
+	
+Basically it spawns a straight line in the North West compass direction by default. It takes the starting position and subtracts 1 from the `x` coordinate each time and returns those new coordinates.
+
+I created a whole bunch of functions that you can call as variables for this so you have more options. N, NE, W, NW, E, SW, S, SE all the possible directions you can spawn a shell bell song, assuming you want to do so in a straight line. I didn't see the need for stuff like curved lines or the like, but there may be folks out there who want that.
+
+	N = function(pos, mult)
+		return Vector3(pos.x - 1 * mult, 0, pos.z + 1 * mult)
+	end
+
+	NE = function(pos, mult) 
+		return Vector3(pos.x, 0, pos.z - 1 * mult)
+	end
+
+	W = function(pos, mult)
+		return Vector3(pos.x + 1 * mult, 0, pos.z + 1 * mult)
+	end
+	NW = function(pos, mult) 
+		return Vector3(pos.x - 1 * mult, 0, pos.z)
+	end
+
+	E = function(pos, mult)
+		return Vector3(pos.x - 1 * mult, 0, pos.z - 1 * mult )
+	end
+
+	SW = function(pos, mult) 
+		return Vector3(pos.x, 0, pos.z + 1 * mult)
+	end
+
+	S = function(pos, mult)
+		return Vector3(pos.x + 1 * mult, 0, pos.z - 1 * mult)
+	end
+
+	SE = function(pos, mult) 
+		return Vector3(pos.x + 1 * mult, 0, pos.z)
+	end
+	
+Unlike the previous functions, you don't need to invoke the function using parentheses `()`! You can simply call it like this:
+
+	local here = Coords(90, 0, -300)
+	c_shellsfromtable(mysongs.thelick, here, SE)
+	
+This works because it's taking the coordinates from the `local here` variable, it's receiving those as input. Oh, I should probably mention the `spacing_mult`parameter just to complete the set!
+
+# spacing_mult
+
+It's exactly what it says. Whatever number you input here is multiplied to all the `t` values. I always use this because my code on its own sets the note durations to be a super close to each other. I generally declare a local variable set to a number as my `spacing_mult`, especially if I'm spawning in multiple songfiles and I want to fine tune the tempo quickly. Let's look again at my "Whiplash" arrangement:
+
+	local here = Coords(400, 0, -326)	-- center line
+	local dir = NW
+	local mult = 5
+	c_shellsfromtable(mysongs.whiplash_melody, here, dir, mult)
+	here.z = -325 -- left side
+	c_shellsfromtable(mysongs.whiplash_bass, here, dir, mult)
+	here.z = -327 -- right side
+	c_shellsfromtable(mysongs.whiplash_bass, here, dir, mult)
+	
+I set `mult` to be `5`, so all my notes are gonna be 5 times farther from each other now. Each song is different, so I recommend you find a tempo you like through trial and error! Speaking of trial and error...
+
+# Removing all the Shell Bells
+
+You may find yourself spawning in your song then immediately thinking "I need to change something real quick!". I know that happened to me a lot in creating this mod, so I made this simple function:
+
+	function ShellsRemove(radius)     -- this command is very robust. be careful with how you use it!
+		local ents = {}
+		if radius ~= nil then
+			local x,y,z = ThePlayer.Transform:GetWorldPosition()
+			ents = TheSim:FindEntities(x,y,z, radius)
+		else
+			ents = Ents
+		end
+
+		local count = 0
+		for k,v in pairs(ents) do
+			if (v.prefab == "singingshell_octave3") or 
+			(v.prefab == "singingshell_octave4") or 
+			(v.prefab == "singingshell_octave5") then
+				v:Remove()
+				count = count + 1
+			end
+		end
+
+		if radius ~= nil then
+			print(string.format("We successfully removed [%d] shell bells in a %d unit radius.", count, radius))
+		else
+			print(string.format("We successfully removed [%d] shell bells from this Shard.", count))
+    	end
+	end
+	
+Basically if you call `ShellsRemove()` on its own, it'll remove every single shell bell in that shard! I have to stress this is a **very robust command**. I would really advise against doing this in a server where people use shell bells for stuff, be it for resources or decoration or anything. I haven't yet found a way to sort of "undo" a song, and I don't even know if it's possible.
+
+You can also specify a number as the argument within `ShellsRemove()` so you can remove everything within a certain radius.
+
+There's also `ShellsCount()` which is the exact same thing but it just doesn't remove the shells, so it can tell you how many shells you have in the world/in a radius without affecting your song.
