@@ -420,6 +420,42 @@ Assuming your song is located under the folder `scripts/songs/My Songs/`, simply
 	
 No need for the `.lua` extension. After all this, assuming everything went well with no errors, you should be able to call your song ingame! If this file `scripts/songs/My Songs/thelick.lua` did exist, then I could call it with `c_shellsfromtable(mysongs.thelick)`!
 
+# Declaring custom folders
+
+What if you don't want to use the `My Songs` folder? What if you have a subfolder within `My Songs` or a subfolder within your new folder? It's not too hard! Just follow these instructions.
+
+You'll have to declare a new string key under the `dir` table. Depending on where it's located, the name will differ. Let's say you created a folder called `Epic Tunes` under `scripts/songs`. You should have sometihng like this:
+
+	local songlist = {} 
+	local directory = {}
+	local dir = directory 
+	
+	dir["Epic Tunes"] =
+	{
+	
+	}
+
+Then you can declare whatever songs are inside the `Epic Tunes` folder inside the table of the same key!
+
+What if your song files are located in a subfolder? First, identify the full path starting from the main `songs` folder. Let's say I created a folder `scripts/songs/My Songs/Rock/`. You can declare it like this:
+
+	local songlist = {} 
+	local directory = {}
+	local dir = directory 
+	
+	dir["My Songs/Rock"] =
+	{
+	
+	}
+	
+Notice how the the parent folder has a forward slash `/` but the last folder in the path does not. My code automatically adds a slash at the end of each key for the `dir` table.
+
+Since I'm on Windows 10, my system actually uses back `\` slashes. Although I do know different systems may use the forward `/` slash. DST's code usually uses forward `/` slashes so let's go with that just so everybody is on the same page. This likely because LUA uses the back `\` slash as an escape character, so if we wanted to use back slashes in strings for filepaths it would actually look like `My Songs\\Rock` because we have to escape with the 1st back slash, then the character right after that is the actual back slash that will appear in the string.
+
+Just as an aside, the game actually checks filepaths with both slashes! It'll check your file path with one kind of slash at first, for example the forward `/` slash. Then if it doesn't find any matching files with that slash, it'll look in the same path but substitute the forward `/` slash with the back `\` slash. 
+
+I should also mention, if you made a typo or got the wrong folder/file name, the game WILL crash upon startup (assuming the mod is enabled then). Make sure you do this carefully!
+
 # THE OTHER PARAMETERS
 
 Obviously simply spawning in your song directly isn't enough. It's incredibly likely the distances are too short, or it spawned in the wrong direction, or you want it to start at a very specific location. I have a few functions to accomodate for those.
