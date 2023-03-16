@@ -25,13 +25,11 @@ Lastly, I'd encourage you to use some sort of counting system. I personally use 
 
 # THE BASICS 
 
-Let's start from the very top. What is this mod even going to be used in? How does the shell bell song file even originally work? There's a console command (defined under, well, the base game's `scripts/consolecommands.lua`) which lets you spawn in shell bell songs. The command goes as follows:
-
-`c_shellsfromtable(song, startpos, placementfn, spacing_multiplier)`
+Let's start from the very top. What is this mod even going to be used in? How does the shell bell song file even originally work? There's a console command (defined under, well, the base game's `scripts/consolecommands.lua`) which lets you spawn in shell bell songs. The command goes as follows: `c_shellsfromtable(song, startpos, placementfn, spacing_multiplier)`
 
 Parameter `song` should be a LUA `table ` of subtables. By default, if you don't input anything for this parameter, it will default to `notetable_dsmaintheme`. That's because of this line for the definition of `c_shellsfromtable`:
 
-    song = song or require("notetable_dsmaintheme")
+	song = song or require("notetable_dsmaintheme")
     
 This works thanks to how the `or` evaluation works. Basically, it checks 2 arguments. If the 1st one is `true` (that is, there *is* an input at all that is *not* `nil`) then it will return that one. In this case if you input literally any existing global variable, string, number or whatever under the `song` parameter, then the the 2nd variable `song` (the one being declared *inside of the command, which is technically different from the one you input*) will be set to that value.
 
@@ -39,7 +37,7 @@ However, if the 1st argument is `nil` (either by inputting nothing or flat out t
 
 The next block of code is important. 
 
-    if song == nil or type(song) ~= "table" then
+	if song == nil or type(song) ~= "table" then
 		print("Error: Invalid 'notes' table")
 		return false, "INVALID_NOTES_TABLE"
 	end
@@ -48,51 +46,51 @@ Basically if variable `song` is set to something, if `song` is set to a nonexist
 
 To explain how my mod works and why I made it, let's see what `notetable_dsmaintheme` is all about! This is, in my opinion, very important to understand as it's how shell bell songs are created at all. I'll discuss the other parameters much much later.
 
-    local notes =   -- create a table called notes.
-    {
-        { 44, t=0.048 },    -- subtable. the first value is ALWAYS a number which represents a pitch.
-        { 56, t=0.08 },     -- valid pitch values go from number 37-72, which represent pitches C3-B5. just 1 semitone under 3 octaves.
-        { 39, t=5.848 },    -- the second value is a "t" value, which represents distance away from the starting position.
-        { 63, t=5.808 },    -- treat the "t" value as being in reference to the game's distance units, every multiple of 1 is a wall unit,
-        { 44, t=11.528 },   -- and every multiple of 4 is a tile.
-        { 56, t=11.592 },
-        { 63, t=15.416 },
-        { 64, t=16.32 },
-        { 63, t=17.256 },
-        { 39, t=17.312 },
-        { 56, t=23.12 },
-        { 44, t=23.152 },
-        { 59, t=28.832 },
-        { 39, t=28.96 },
-        { 56, t=30.768 },
-        { 53, t=32.64 },
-        { 51, t=34.488 },
-        { 55, t=34.544 },
-        { 46, t=40.408 },
-        { 52, t=42.312 },
-        { 51, t=44.24 },
-        { 56, t=46.168 },
-        { 44, t=46.304 },
-        { 59, t=49.992 },
-        { 46, t=50.976 },
-        { 63, t=51.792 },
-        { 47, t=51.8 },
-        { 59, t=55.76 },
-        { 40, t=57.736 },
-        { 64, t=57.744 },
-        { 61, t=61.52 },
-        { 58, t=63.512 },
-        { 37, t=63.536 },
-        { 59, t=69.104 },
-        { 39, t=69.272 },
-        { 58, t=74.928 },
-        { 46, t=74.928 },
-        { 43, t=78.656 },
-        { 59, t=78.688 },
-        { 44, t=80.536 },
-        { 56, t=80.624 },
-    }
-    return notes    -- at the very end return the notes table. this is later called with `require("notetable_dsmaintheme)` for the default song parameter.
+	local notes =   -- create a table called notes.
+	{
+		{ 44, t=0.048 },    -- subtable. the first value is ALWAYS a number which represents a pitch.
+		{ 56, t=0.08 },     -- valid pitch values go from number 37-72, which represent pitches C3-B5. just 1 semitone under 3 octaves.
+		{ 39, t=5.848 },    -- the second value is a "t" value, which represents distance away from the starting position.
+		{ 63, t=5.808 },    -- treat the "t" value as being in reference to the game's distance units, every multiple of 1 is a wall unit,
+		{ 44, t=11.528 },   -- and every multiple of 4 is a tile.
+		{ 56, t=11.592 },
+		{ 63, t=15.416 },
+		{ 64, t=16.32 },
+		{ 63, t=17.256 },
+		{ 39, t=17.312 },
+		{ 56, t=23.12 },
+		{ 44, t=23.152 },
+		{ 59, t=28.832 },
+		{ 39, t=28.96 },
+		{ 56, t=30.768 },
+		{ 53, t=32.64 },
+		{ 51, t=34.488 },
+		{ 55, t=34.544 },
+		{ 46, t=40.408 },
+		{ 52, t=42.312 },
+		{ 51, t=44.24 },
+		{ 56, t=46.168 },
+		{ 44, t=46.304 },
+		{ 59, t=49.992 },
+		{ 46, t=50.976 },
+		{ 63, t=51.792 },
+		{ 47, t=51.8 },
+		{ 59, t=55.76 },
+		{ 40, t=57.736 },
+		{ 64, t=57.744 },
+		{ 61, t=61.52 },
+		{ 58, t=63.512 },
+		{ 37, t=63.536 },
+		{ 59, t=69.104 },
+		{ 39, t=69.272 },
+		{ 58, t=74.928 },
+		{ 46, t=74.928 },
+		{ 43, t=78.656 },
+		{ 59, t=78.688 },
+		{ 44, t=80.536 },
+		{ 56, t=80.624 },
+	}
+	return notes    -- at the very end return the notes table. this is later called with `require("notetable_dsmaintheme)` for the default song parameter.
 
 I added comments to try to explain what's going on, but let me explain it again here if it's note clear. The file starts out by creating a table called `notes`. Under the `notes` table, we have many more tables within its scope. Each of these tables, or as I prefer to call them "note tables", contain two things. 
 
@@ -133,20 +131,20 @@ Another option is to directly create your song table within the game's console, 
 
 Not only that, but the system of numbers representing pitches and t values as absolute distances made it very difficult to keep track of everything. I cannot stress enough how annoying it is to constantly translate which numbers are which pitches. And although the t values aren't too bad, it requires a bit of mental work to keep track of the absolute distance as well as its place relative to the other notes. Here is an example tune, let's say it's under a mod's `scripts` folder and the file is named `tune.lua`.
 
-    local notes =
-    {
-        -- D3 E3 F3 G3
-        { 39, t = 0.0},
-        { 41, t = 0.5}, -- values of 1 are my quarter notes, and values half of that are my eighth notes.
-        { 42, t = 1.0},
-        { 44, t = 1.5},
-        
-        -- E3   C3 D3
-        { 41, t = 2.0},
-        { 37, t = 3.0},
-        { 39, t = 3.5},
-    }
-    return notes
+	local notes =
+	{
+		-- D3 E3 F3 G3
+		{ 39, t = 0.0},
+		{ 41, t = 0.5}, -- values of 1 are my quarter notes, and values half of that are my eighth notes.
+		{ 42, t = 1.0},
+		{ 44, t = 1.5},
+
+		-- E3   C3 D3
+		{ 41, t = 2.0},
+		{ 37, t = 3.0},
+		{ 39, t = 3.5},
+	}
+	return notes
     
 This took quite a bit of work for me to write, and it was only 7 notes! At least we have a song now. But for larger projects/songs, using this barebones system (in my opinion at least) would be a nightmare. So I created a whole bunch of stuff to not only help the song files makes musical sense to us, but also to make them easier to write and edit.
 
@@ -201,17 +199,17 @@ In general, under your `data.notes` table, you will be creating note tables with
 	data.notes =
 	{
 	-- 1ST MEASURE
-	--[[1]] { "D3", t = "1/8" },
-	--[[&]] { "E3", t = "1/8" },
+		--[[1]] { "D3", t = "1/8" },
+		--[[&]] { "E3", t = "1/8" },
 
-	--[[2]] { "F3", t = "1/8" },
-	--[[&]] { "G3", t = "1/8" }, 
+		--[[2]] { "F3", t = "1/8" },
+		--[[&]] { "G3", t = "1/8" }, 
 
-	--[[3]] { "E3", t = "1/4" }, 
-	--[[&]] 
+		--[[3]] { "E3", t = "1/4" }, 
+		--[[&]] 
 
-	--[[4]] { "C3", t = "1/8" }, 
-	--[[&]] { "D3", t = "1/8" }, 
+		--[[4]] { "C3", t = "1/8" }, 
+		--[[&]] { "D3", t = "1/8" }, 
 	}
 	return data
 
@@ -230,9 +228,9 @@ The octave number change for every new C.
 
 In general the useable pitch values for shell bells are: 
         
-    C3, D3, E3, F3, G3, A3, B3, -- this octave is Low C, an octave below Middle C on the piano.
-    C4, D4, E4, F4, G4, A4, B4, -- this octave is Middle C on the piano.
-    C5, D5, E5, F5, G5, A5, B5, -- this octave is High C, an octave above Middle C on the piano.
+	C3, D3, E3, F3, G3, A3, B3, -- this octave is Low C, an octave below Middle C on the piano.
+	C4, D4, E4, F4, G4, A4, B4, -- this octave is Middle C on the piano.
+	C5, D5, E5, F5, G5, A5, B5, -- this octave is High C, an octave above Middle C on the piano.
    
 You can actually go outside this range, provided that your entire song file **does have a total range of 3 octaves or more**. That's where the `data.transpose` value comes in. It can accept a positive or negative number of semitones which well then be added to each pitch string's associated pitch number value, effectively transposing the whole song file. You don't actually need to specify anything for `data.transpose`, heck you can even outright omit it! If there's nothing found for it then the code just substitutes the number `0` in its place to indicate no transposition is occuring.
 
@@ -244,25 +242,25 @@ The right value in your note table is still the `t` value, but you can using a s
 
 The Basic Rhythms are:
     
-    t = "4/4" is a whole note, 
-    t = "2/4" is a half, 
-    t = "1/4" is a quarter, 
-    t = "1/8" is an eighth, 
-    t = "1/16" is a sixteenth,
-    t = "1/32" is a thirty second,
-    t = "1/64" is a sixty fourth,
+	t = "4/4" is a whole note, 
+	t = "2/4" is a half, 
+	t = "1/4" is a quarter, 
+	t = "1/8" is an eighth, 
+	t = "1/16" is a sixteenth,
+	t = "1/32" is a thirty second,
+	t = "1/64" is a sixty fourth,
 
 No values shorter that a "1/64" are supported, although I assigned some custom values representing various Time Signatures.
 Of note are:
-    
-    t = "7/4" represents a whole bar in 7/4 time.
-    t = "5/4" represents a whole bar in 5/4 time.
-    t = "3/4" represents a whole bar in 3/4 time.
 
-    t = "12/8" represents a whole bar in 12/8 time.
-    t = "9/8" represents a whole bar in 9/8 time.
-    t = "6/8" represents a whole bar in 6/8 time.
-    t = "3/8" represents a whole bar in 3/8 time.
+	t = "7/4" represents a whole bar in 7/4 time.
+	t = "5/4" represents a whole bar in 5/4 time.
+	t = "3/4" represents a whole bar in 3/4 time.
+
+	t = "12/8" represents a whole bar in 12/8 time.
+	t = "9/8" represents a whole bar in 9/8 time.
+	t = "6/8" represents a whole bar in 6/8 time.
+	t = "3/8" represents a whole bar in 3/8 time.
 
 
 
@@ -277,9 +275,9 @@ The very first Note Table is always set to distance `0`. Every other Note Table'
 
 For example:
 
-    { "C4", t = "1/4" }, 
-    { "D4", t = "1/8" }, 
-    { "E4", t = "1/8" },
+	{ "C4", t = "1/4" }, 
+	{ "D4", t = "1/8" }, 
+	{ "E4", t = "1/8" },
 
 Pitch `"C4"` is at distance `0`. 
     There is no Note Table before it, so it is set to 0 to be the start of the song's first measure.
@@ -303,8 +301,8 @@ You can also add an asterisk `*` after the last character in each duration strin
 
 For example:
 
-    t = "1/4*" is a dotted quarter, 
-    t = "1/8*" is a dotted eighth.
+	t = "1/4*" is a dotted quarter, 
+	t = "1/8*" is a dotted eighth.
     
 and so on.
 
@@ -312,8 +310,8 @@ You can do the same for double dotted notes, just use 2 asterisks instead of 1. 
 
 What about triplets and other tuplets? To do so, first enclose the number of the tuplet you'd like in brackets `[]` like so:
 
-    t = "[3]1/4" is a triplet quarter note. 
-    This is especially useful in approximating music with a swing eighths feel.
+	t = "[3]1/4" is a triplet quarter note. 
+	This is especially useful in approximating music with a swing eighths feel.
 
 Swung 8ths would look like this:
 
