@@ -30,7 +30,7 @@ return data
 > 
 > `data.transpose` is how many semitones you want to tranpose all notes by. 
 > 
-> `data.notes` is a table containing many subtables, each of these subtables contains you pitch information and rhythm duration information.
+> `data.notes` is a table containing many subtables, each of these subtables contains your pitch information and rhythm duration information.
 
 That's the basic formula for making a songfile. As long as you understand that you're creating LUA tables, and you have an idea of how your song goes, everything (in theory) will be fine. Rinse and repeat this process for however long your song is, or for however many parts/voices you want to include.
 
@@ -82,7 +82,7 @@ c_shellsfromtable(whiplash_bass, here, dir, mult)
 here.z = -301
 c_shellsfromtable(whiplash_comp, here, dir ,mult)
 ```
-That should be everything in a nutshell. If you didn't fully understand something, please read the in-depth breakdwon.
+That should be everything in a nutshell. If you didn't fully understand something, please read the in-depth breakdown.
 
 # In-depth Breakdown
 
