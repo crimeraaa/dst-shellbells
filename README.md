@@ -1,5 +1,58 @@
 # dst-shellbells
-A way to somewhat make writing shell bell songs in Don't Starve Together a little bit more bearable.
+A way to somewhat make writing shell bell songs in Don't Starve Together (DST) a little bit more bearable.
+
+## tl;dr, just get to the point you nerd
+
+To use this mod, simply subscribe to it on the Steam Workshop (not yet uploaded) or download this whole folder and place it within your DST mods folder. Under `scripts/songs/My Songs` (or any folder/subfolders of your choosing really, just make sure they begin at `scripts/songs/`) create a new LUA file with these something along these lines:
+
+```LUA
+local data = {}
+data.title = "examplesong"
+data.transpose = 0 -- may be omitted
+data.notes =
+{
+-- 1ST MEASURE
+	--[[1]] { "D3", t = "1/8" },
+	--[[&]] { "E3", t = "1/8" },
+
+	--[[2]] { "F3", t = "1/8" },
+	--[[&]] { "G3", t = "1/8" }, 
+
+	--[[3]] { "E3", t = "1/4" }, 
+	--[[&]] 
+
+	--[[4]] { "C3", t = "1/8" }, 
+	--[[&]] { "D3", t = "1/8" }, 
+}
+return data
+```
+> `data.title` is the variable name you want to call on later. 
+> 
+> `data.transpose` is how many semitones you want to tranpose all notes by. 
+> 
+> `data.notes` is a table containing many subtables, each of these subtables contains you pitch information and rhythm duration information.
+
+That's the basic formula for making a songfile. When you're done with making your song, go to `scripts/songlist.lua` and declare your filename under the correct `dir` key. 
+
+```LUA
+local songlist = {}
+local directory = {}
+local dir = directory
+
+dir["My Songs"] =
+{
+	"mysongfilename",
+}
+```
+> In general I'd recommend you to store your own songfiles under the `scripts/songs/My Songs` folder. However, if you choose to use a different folder or use a subfolder within another folder, then be sure to declare the correct path.
+>
+> DST's code typically uses forward `/` slashes for filepaths. If you have a folder `scripts/songs/My Songs/Rock/` for example, then create a new table like `dir["My Songs/Rock"]` without the final forward slash, as my code automatically appends that.
+
+After declaring your song, assuming everything went well, you can now call your songs by indexing the global table `mysongs` using the `data.title` string as the key. For example, `mysongs.examplesong`. 
+
+I would recommend against using spaces and special characters for your song's title, but as long as `data.title`  returns a literal string it should be fine. For example if i set `data.title = "Example Song!!!"` then I would have to index this file by using square brackets `[]` instead of the period `.`, like `mysongs["Example Song!!!"]`.
+
+# In-depth Breakdown
 
 ## How the hell does this all even work?
 
