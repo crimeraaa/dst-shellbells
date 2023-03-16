@@ -35,7 +35,7 @@ Parameter `song` should be a LUA `table ` of subtables. By default, if you don't
     
 This works thanks to how the `or` evaluation works. Basically, it checks 2 arguments. If the 1st one is `true` (that is, there *is* an input at all that is *not* `nil`) then it will return that one. In this case if you input literally any existing global variable, string, number or whatever under the `song` parameter, then the the 2nd variable `song` (the one being declared *inside of the command, which is technically different from the one you input*) will be set to that value.
 
-However, if the 1st argument is `nil` (either by inputting nothing or flat out typing `nil`), then the evalution to move to the next argument. The second argument is `require("notetable_dsmaintheme"`. This is referring to the file of the same name, `notetable_dsmaintheme.lua` which returns its notes table upon being called with `require`. Because it's an existing input, this argument will always return anything *but* `nil` and thus will pass should this condition be reached, making the dsmaintheme the default song which is called.
+However, if the 1st argument is `nil` (either by inputting nothing or flat out typing `nil`), then the evalution to move to the next argument. The second argument is `require("notetable_dsmaintheme")`. This is referring to the file of the same name, `notetable_dsmaintheme.lua` which returns its notes table upon being called with `require`. Because it's an existing input, this argument will always return anything *but* `nil` and thus will pass should this condition be reached, making the dsmaintheme the default song which is called.
 
 The next block of code is important. 
 
@@ -46,7 +46,7 @@ The next block of code is important.
 
 Basically if variable `song` is set to something, if `song` is set to a nonexistent global variable OR it's a valid global variable that isn't a table, then the command will print the error and stop there. This is important because it establishes two things: 1) Our song file MUST be a LUA table, and 2) Our song file must be accessible within the global environment. DST Mods by default have their own separate environment, so mod global variables in a DST mod can't actually be accessed with the ingame console. This can be averted by explicitly declaring a variable to be GLOBAL within your mod, or setting the mod's environment to GLOBAL.
 
-To explain how my mod works and why I made it, let's see what `notetable_dsmaintheme` is all about! This is, in my opinion, very important to understand as it's how shell bell songs are created at all. I'll discuss the other parameters much much later.
+To explain how my mod works and why I made it, let's see what `notetable_dsmaintheme.lua` is all about! This is, in my opinion, very important to understand as it's how shell bell songs are created at all. I'll discuss the other parameters much much later.
 
 	local notes =   -- create a table called notes.
 	{
@@ -94,7 +94,7 @@ To explain how my mod works and why I made it, let's see what `notetable_dsmaint
 	}
 	return notes    -- at the very end return the notes table. this is later called with `require("notetable_dsmaintheme)` for the default song parameter.
 
-I added comments to try to explain what's going on, but let me explain it again here if it's note clear. The file starts out by creating a table called `notes`. Under the `notes` table, we have many more tables within its scope. Each of these tables, or as I prefer to call them "note tables", contain two things. 
+I added comments to try to explain what's going on, but let me explain it again here if it's note clear. The file starts out by creating a table called `notes`. Under the `notes` table, we have many more tables within its scope. Each of these tables, or as I prefer to call them "individual note tables", contain two things. 
 
 
 
@@ -183,7 +183,7 @@ What we did here is create an empty table called `data`, and assigned several ke
 1. Do not use any special characters like dots `.` and hastags `#`.
 2. Use underscores `_` instead of spaces.
 
-The reason for the above is because later on, your song file is actually inserted into a global table called `mysongs` with the `data.title` value as the key for your song. You can index that table to reach your song, assuming it compiled properly.
+The reason for the above is because later on, your song file is actually inserted into a global table called `mysongs` with the `data.title` value as the key for your song. The dots `.` and hastags `#` aren't wrong on their own, but you'll have to call your song with square brackets and specify the string! You can index that table to reach your song, assuming it compiled properly.
 
 For example, later on I can call this song through `c_shellsfromtable(mysongs.thelick)`. 
 
@@ -195,7 +195,7 @@ Both using the dot `.` and the square brackets `[]` to index the table `mysongs`
 
 # How do note tables in the custom song files work?
   
-In general, under your `data.notes` table, you will be creating note tables within this scope to represent your notes with their associated duration. These are the "note tables". For example here are possible contents of `scripts/songs/My Songs/thelick.lua`
+In general, under your `data.notes` table, you will be creating note tables within this scope to represent your notes with their associated duration. These are the "individual note tables". For example here are possible contents of `scripts/songs/My Songs/thelick.lua`
 
 	local data = {}
 	data.title = "thelick"
@@ -223,12 +223,11 @@ The comments `-- 1ST MEASURE` and all the rhythmic syllables like `--[[1]]` and 
 
 # Pitch Values
 
-The left value in each note table is the `"PITCH"` value. Instead of using good old numbers 37-72, we can use strings! In general all pitches from C3-B5 are accepted. You can actually use numbers and I'm (fairly) certain it will work fine. But I greatly prefer to strings as they communicate the relevant musical information to me much quicker and I haven't tested it enough, I also recommend *against* using it just because of how unreadable it can be.
+The left value in each individual note table is the `"PITCH"` value. Instead of using good old numbers 37-72, we can use strings! In general all pitches from C3-B5 are accepted. You can actually use numbers and I'm (fairly) certain it will work fine. But I greatly prefer to strings as they communicate the relevant musical information to me much quicker and I haven't tested it enough, I also personally don't like using it just because of how unreadable it can be.
 
 Should you use a string, make sure it contains the note's letter name along wwith its respective octave. This is the Scientific Pitch Notation system! I encourage you to read about it so this makes more sense. 
 
-String `"C4"` will represent middle C, for example. string `"B3"` will represent the B natural right below Middle C.
-The octave number change for every new C. 
+String `"C4"` will represent middle C, for example. string `"B3"` will represent the B natural right below Middle C. The octave number change for every new C. 
 
 In general the useable pitch values for shell bells are: 
         
@@ -244,7 +243,7 @@ You can actually go outside this range, provided that your entire song file **do
 
 # Rhytmic Values
 
-The right value in your note table is still the `t` value, but you can using a string to represent various durations! It contains the note's intended duration in terms of a fraction of a whole note.
+The right value in your individual note table is still the `t` value, but you can using a string to represent various durations! It contains the note's intended duration in terms of a fraction of a whole note.
 
 The Basic Rhythms are:
     
@@ -298,7 +297,7 @@ Pitch `"E4"` is at distance `0.375`.
 The previous Note Table `"D4"` has duration 1/8 or 0.125, and distance right now is 0.25.
     So our new distance = previous duration 0.125 + distance of 0.25.
     Our new distance for this note is 0.375, meaning:
-    Pitch "E4" is a 1/4th + 1/8th duration away from the start.
+    Pitch `"E4"` is a 1/4th + 1/8th duration away from the start.
 
 Technically you don't need to set the t value for the very last note to anything as it's never used,
     but I think it's good practice to keep track of all your notes' rhythms.
@@ -324,7 +323,7 @@ Swung 8ths would look like this:
     t = "[3]1/4", this is the downbeat which will last for 2/3 of the triplet.
     t = "[3]1/8", this is the upbeat which will last for 1/3 of the triplet.
 
-Triplets, or `[3]`, up to Nonuplets `[9]` are supported for all the Basic Rhythms.
+Triplets `[3]` up to Nonuplets `[9]` are supported for all the Basic Rhythms.
 
 These next sections involve writing LUA tables. Please follow the examples' formatting carefully.
 
@@ -332,7 +331,7 @@ These next sections involve writing LUA tables. Please follow the examples' form
 
 # Rests and Ties
     
-The Basic Rhythms, even with all the Tuplets and Dotteds, still don't cover a lot of rhytmic possibilites! So to remedy that here's a way you can effectively create rests or tie a note's duration to be longer.
+The Basic Rhythms, even with all the Tuplets and Dotteds, still don't cover a lot of rhythmic possibilites! So to remedy that here's a way you can effectively create rests or tie a note's duration to be longer.
 
 For Rests:
 
