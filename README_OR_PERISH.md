@@ -3,13 +3,21 @@ A way to somewhat make writing shell bell songs in Don't Starve Together a littl
 
 How the hell does this all even work?
 
-This mod is intended to be used as a way for you to make your own LUA files that contain the song information you want to be turned into a long line of shell bells. I'd recommend having a basic grasp of LUA syntax and some basic Western Music Theory concepts like rhythms, rhythmic syllable counting, scientific pitch notation, time signatures and such. For the entirety of this mod I will be using the scientific pitch notation system. It uses Letter Names combined with the respective octave of the note, e.g. C4, B3, F#5 and so on.
+This mod is intended to be used as a way for you to make your own LUA files that contain the song information you want to be turned into a long line of shell bells. 
+
+I'd recommend the following:
+
+1. Having a basic grasp of LUA syntax.
+2. A Code Editor.
+3. A basic understing of ome basic Western Music Theory concepts. (rhythms, rhythmic syllable counting, scientific pitch notation, time signatures)
+ 
+For the entirety of this mod I will be using the scientific pitch notation system. It uses Letter Names combined with the respective octave of the note, e.g. C4, B3, F#5 and so on. I will also be using the American way of naming note durations such as "whole note", "half note", "quarter note" and so on as that's what I know best. Lastly, I'd encourage
 
 
 
 # THE BASICS 
 
-Let's start from the very top. What is this mod even going to be used in? How does the shell bell song file even originally work? There's a console command (defined under, well, the base game's `scripts/customcommands.lua`) which lets you spawn in shell bell songs. The command goes as follows:
+Let's start from the very top. What is this mod even going to be used in? How does the shell bell song file even originally work? There's a console command (defined under, well, the base game's `scripts/consolecommands.lua`) which lets you spawn in shell bell songs. The command goes as follows:
 
 `c_shellsfromtable(song, startpos, placementfn, spacing_multiplier, out_of_range_mode)`
 
@@ -179,21 +187,25 @@ Both using the dot (`.`) and the square brackets (`[]`) to index the table `myso
   
 In general, under your `data.notes` table, you will be creating note tables within this scope to represent your notes with their associated duration. These are the "note tables". For example here are possible contents of `scripts/songs/My Songs/thelick.lua`
 
-    data.notes =
-    {
-    -- 1ST MEASURE
-        --[[1]] { "D3", t = "1/8" },
-        --[[&]] { "E3", t = "1/8" },
-        
-        --[[2]] { "F3", t = "1/8" },
-        --[[&]] { "G3", t = "1/8" }, 
-        
-        --[[3]] { "E3", t = "1/4" }, 
-        --[[&]] 
-        
-        --[[4]] { "C3", t = "1/8" }, 
-        --[[&]] { "D3", t = "1/8" }, 
-    }
+	local data = {}
+	data.title = "thelick"
+	data.transpose = 0
+	data.notes =
+	{
+	-- 1ST MEASURE
+	--[[1]] { "D3", t = "1/8" },
+	--[[&]] { "E3", t = "1/8" },
+
+	--[[2]] { "F3", t = "1/8" },
+	--[[&]] { "G3", t = "1/8" }, 
+
+	--[[3]] { "E3", t = "1/4" }, 
+	--[[&]] 
+
+	--[[4]] { "C3", t = "1/8" }, 
+	--[[&]] { "D3", t = "1/8" }, 
+	}
+	return data
 
 The comments `-- 1ST MEASURE` and all the rhythmic syllables like `--[[1]]` and `--[[&]]` are not needed, but I recommend you put them so you can keep track of your song in terms of measures (or however you like to call them). It helps to divide the workload and if you have an error or something you'd like to change, you can first determine which measure it came from then see which note under that measure you want to access.
 
@@ -372,3 +384,32 @@ For example:
     { "G#4",t = 0 },    { "B4", t = 0 },    { "E5", t = "1/8" }, 
 
 The E major chord consisting of `"G#4"`, `"B4"` and `"E5"` all play at the same time because the all the notes in the chord, except the `"E5"` as it is the last in the chord, have their t values set to 0. The `"E5"` itself has t value of `"1/8"`, making the next nonzero pitch value that distance away from this chord. It's rather confusing but I hope you get the hang of it! This is a quirk of how my code determines time values by indexing the *previous* note table's duration. Oh the things I do for readability...
+
+# DECLARING YOUR SONG FILE
+
+So you finally finished making your song files! Now what? There's one last step we need to take. Go to `scripts/songlist.lua` and open it. The first blocks of code will look like this (comments are not included in this sample, but there are in the original file):
+
+	local songlist = {} 
+	local directory = {}
+	local dir = directory 
+
+	dir["My Songs"] = 
+	{
+	    "template",
+	    "jazzlick",
+	}
+
+Assuming your song is located under the folder `scripts/songs/My Songs/`, simply declare your **filename** as a string. I have to stress again, you should use the **filename, not the `data.title` value inside of your file.** This is because if your `data.title` value is a different name than your filename, then you'll have to be careful which one to declare. In my example file `thelick.lua`, the `data.title` value is also set to `thelick` so no need to worry there. I can declare my file this way:
+
+	local songlist = {} 
+	local directory = {}
+	local dir = directory 
+
+	dir["My Songs"] = 
+	{
+	    "template",
+	    "jazzlick",
+	    "thelick",	-- look mom! i did it!
+	}
+	
+No need for the `.lua` extension. After all this, assuming everything went well with no errors, you should be able to call yoursong ingame! If this file `scripts/songs/My Songs/thelick.lua` did exist, then I could call it with `c_shellsfromtable(mysongs.thelick)`!
