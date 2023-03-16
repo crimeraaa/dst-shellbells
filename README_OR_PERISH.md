@@ -7,9 +7,14 @@ This mod is intended to be used as a way for you to make your own LUA files that
 
 ## I'd recommend the following:
 
-1. Having a basic grasp of LUA syntax.
-2. A Code Editor.
-3. A basic understing of ome basic Western Music Theory concepts. (rhythms, rhythmic syllable counting, scientific pitch notation, time signatures)
+1. Having a basic grasp of syntax of the programming language LUA. 
+2. A Code Editor of some kind.
+	- I personally use Visual Studio Code. Other DST modders use Notepad++ or Sublime, those seem to be popular choices. As long as your code editor supports syntax highlighting for LUA, it should be fine!
+3. A basic understing of ome basic Western Music Theory concepts. 
+	- Rhythms
+	- Rhythmic syllable counting
+	- Sientific pitch notation
+	- Time signatures
 4. (Optional) A soul.
 5. Patience!
  
@@ -19,9 +24,11 @@ I will also be using the American way of naming note durations such as "whole no
 
 Lastly, I'd encourage you to use some sort of counting system. I personally use the system that uses a mix of numbers and simple syllables. 
 
-	Such as "1 e and uh 2 e and uh 3 e and uh 4 e and uh" for 16th note subdivisions.
-	I personally spell the above as "1 e & a 2 e & a 3 e & a". 		
-	Triplets are "1 & a 2 & a 3 & a 4 & a". So on and so forth.
+>*"1 e and uh, 2 e and uh, 3 e and uh, 4 e and uh"* for 16th note subdivisions. 
+> 
+> I personally spell the above as *"1 e & a, 2 e & a, 3 e & a, 4 e & a".* 		
+> 
+> Triplets are *"1 & a, 2 & a, 3 & a, 4 & a"*. So on and so forth.
 
 
 
