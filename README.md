@@ -76,11 +76,11 @@ Especially for spawning multiple song files at the same time, I recommend settin
 local here = Coords(90, 0, -300)
 local dir = NW
 local mult = 6
-c_shellsfromtable(whiplash_melody, here, dir, mult)
+c_shellsfromtable(mysongs.whiplash_melody, here, dir, mult)
 here.z = -299
-c_shellsfromtable(whiplash_bass, here, dir, mult)
+c_shellsfromtable(mysongs.whiplash_bass, here, dir, mult)
 here.z = -301
-c_shellsfromtable(whiplash_comp, here, dir ,mult)
+c_shellsfromtable(mysongs.whiplash_comp, here, dir ,mult)
 ```
 That should be everything in a nutshell. If you didn't fully understand something, please read the in-depth breakdown.
 
@@ -813,9 +813,20 @@ Unlike the previous functions, you don't need to invoke the function using paren
 local here = Coords(90, 0, -300)
 c_shellsfromtable(mysongs.thelick, here, SE)
 ```
+ 
+> This is because of how `placementfn`, whatever it was set to, is then set to take the `startpos` and `spacing_multiplier` values as inputs in the middle spawning in the shells within the definition of `c_shellsfromtable` .
+```LUA
+for i, notes in ipairs(song) do
+	local applied_spawning_pos
 
-> This works because it's taking the coordinates from the `local here` variable, it's receiving those as input. 
-> 
+	if notes.t == nil then
+		spawning_pos = placementfn(spawning_pos, spacing_multiplier)
+		applied_spawning_pos = spawning_pos
+	else
+		applied_spawning_pos = placementfn(spawning_pos, notes.t * spacing_multiplier)
+	end
+-- rest of the function is cut off for brevity.
+``` 
 > Oh, I should probably mention the `spacing_mult`parameter just to complete the set!
 
 ### spacing_mult
