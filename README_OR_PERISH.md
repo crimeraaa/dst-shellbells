@@ -6,8 +6,8 @@ How the hell does this all even work?
 This mod is intended to be used as a way for you to make your own LUA files that contain the song information you want to be turned into a long line of shell bells. I'd recommend having a basic grasp of LUA syntax and some basic Western Music Theory concepts like rhythms, rhythmic syllable counting, scientific pitch notation, time signatures and such. For the entirety of this mod I will be using the scientific pitch notation system. It uses Letter Names combined with the respective octave of the note, e.g. C4, B3, F#5 and so on.
 
 
-/// THE BASICS ///
 
+# THE BASICS 
 
 Let's start from the very top. What is this mod even going to be used in? How does the shell bell song file even originally work? There's a console command (defined under, well, the base game's `scripts/customcommands.lua`) which lets you spawn in shell bell songs. The command goes as follows:
 
@@ -81,8 +81,8 @@ To explain how my mod works and why I made it, let's see what `notetable_dsmaint
 I added comments to try to explain what's going on, but let me explain it again here if it's note clear. The file starts out by creating a table called `notes`. Under the `notes` table, we have many more tables within its scope. Each of these tables, or as I prefer to call them "note tables", contain two things. 
 
 
-/// THE NUMBER PITCH VALUES ///
 
+# Number to Pitch Values
 
 Baritone    =   36-48, or C3-B3
 Alto        =   49-60, or C4-B4
@@ -91,8 +91,8 @@ Soprano     =   61-72, or C5-B5
 The first value each note table has is always a number value, which represents a particular pitch. Technically, pitch C1 is number 1 and pitch B2 is number 36, pitch C6 is number 73. But because no shell bells are ever mapped to these sounds, they should not be used. 
 
 
-/// THE T VALUES ///
 
+# The "t" values
 
 The second value each note table has a `t = (number)` value. This actually represents distance away from the starting point, which is by default your cursor's position. It's a way to loosely map "time" for lack of better word. There is no standardization here and this file is actually quite confusing to me because I can't see a pattern in the values immediately. But I can tell you this tune is in 3/4 time, in the key of G Minor. If we simply used
 
@@ -101,8 +101,8 @@ To spawn `notetable_dsmaintheme`, simply type `c_shellsfromtable()` as is, in th
 That's literally it! It will automatically spawn the song at your cursor's position in a straight line going in the North West compass direction.
 
 
-/// MY TAKE ///
 
+# My Thoughts
 
 Here is the most basic way I could think of to create your own song files.
 
@@ -135,12 +135,18 @@ Not only that, but the system of numbers representing pitches and t values as ab
 This took quite a bit of work for me to write, and it was only 7 notes! At least we have a song now. But for larger projects/songs, using this barebones system (in my opinion at least) would be a nightmare. So I created a whole bunch of stuff to not only help the song files makes musical sense to us, but also to make them easier to write and edit.
 
 
-/// YOUR SONG FILE ///
 
+# CUSTOM SONG FILES
 
-Finally, this nerd is done explaining some dumb nerd stuff. Let's get to the real good stuff! But really I wanted to explain how the original note table was created so we can have an idea of why I'm doing things the way I do. It's also because what my mod is doing is really just taking your song file input and translating that to another table in the previous format which the game can spawn in! This mod is just a way for us to make more immediately readable music that doesn't require us to constantly translate numbers to pitches or the keep track of absolute time ourselves.
+Finally, this nerd is done explaining some dumb nerd stuff! Let's get to the actual good part! /s
+
+But really I wanted to explain how the original note table was created so we can have an idea of why I'm doing things the way I do. It's also because what my mod is doing is really just taking your song file input and translating that to another table in the previous format which the game can spawn in! This mod is just a way for us to make more immediately readable music that doesn't require us to constantly translate numbers to pitches or the keep track of absolute time ourselves.
 
 Let's start by creating a song file. I've already included a `template.lua` file under the `scripts/songs/My Songs/` folder. You can create a copy of that file. I'd recommend keep the original template around for future use and reference. For your copy, feel free to rename and edit it to whatever you like.
+
+
+
+# Creating your song file
 
 Let's say I'm creating a file under the `scripts/songs/My Songs/` folder called `thelick.lua`.
 
@@ -168,8 +174,8 @@ If your `data.title` is, say `data.title = "#The Lick!"` then you can't call it 
 Both using the dot (`.`) and the square brackets (`[]`) to index the table `mysongs` are valid, but it may be a bit tricky knowing that the dot already assumes the key following it is a string. With the square brackets you have to explicitly put quotation marks (`""`) to tell the code that you're trying to index a key that's a string.
 
 
-/// HOW THE NOTE TABLES WORK ///
 
+# How do note tables in the custom song files work?
   
 In general, under your `data.notes` table, you will be creating note tables within this scope to represent your notes with their associated duration. These are the "note tables". For example here are possible contents of `scripts/songs/My Songs/thelick.lua`
 
@@ -191,13 +197,13 @@ In general, under your `data.notes` table, you will be creating note tables with
 
 The comments `-- 1ST MEASURE` and all the rhythmic syllables like `--[[1]]` and `--[[&]]` are not needed, but I recommend you put them so you can keep track of your song in terms of measures (or however you like to call them). It helps to divide the workload and if you have an error or something you'd like to change, you can first determine which measure it came from then see which note under that measure you want to access.
 
-/// PITCH VALUES ///
 
 
-The left value in each note table is the "PITCH" value. It is a string attached to key 1 (a number, not a string!) in your Note Table. It contains the note's letter name along wwith its respective octave. This is the Scientific Pitch Notation system! I encourage you to read about it so this makes more sense. 
+# Pitch Values
 
-You can actually use numbers and I'm (fiarly) certain it will work fine. But I greatly prefer to strings as they communicate the relevant musical information to me much quicker and I haven't tested it enough, I also recommend *against* using it just because of how unreadable it can be.
+The left value in each note table is the "PITCH" value. Instead of using good old numbers 37-72, we can use strings! In general all pitches from C3-B5 are accepted. You can actually use numbers and I'm (fiarly) certain it will work fine. But I greatly prefer to strings as they communicate the relevant musical information to me much quicker and I haven't tested it enough, I also recommend *against* using it just because of how unreadable it can be.
 
+Should you use a string, make sure it contains the note's letter name along wwith its respective octave. This is the Scientific Pitch Notation system! I encourage you to read about it so this makes more sense. 
 
 String "C4" will represent middle C, for example. "B3" will represent the B natural right below Middle C.
 The octave number change for every new C. 
@@ -208,12 +214,13 @@ In general the useable pitch values for shell bells are:
     C4, D4, E4, F4, G4, A4, B4, -- this octave is Middle C on the piano.
     C5, D5, E5, F5, G5, A5, B5, -- this octave is High C, an octave above Middle C on the piano.
    
-You can actually go outside this range, provided that your entire song file *does have a total range of 3 octaves or more*. That's where the `data.transpose` value comes in. It can accept a positive or negative number of semitones which well then be added to each pitch string's associated pitch number value, effectively transposing the whole song file.
+You can actually go outside this range, provided that your entire song file **does have a total range of 3 octaves or more**. That's where the `data.transpose` value comes in. It can accept a positive or negative number of semitones which well then be added to each pitch string's associated pitch number value, effectively transposing the whole song file.
 
-/// RHYTHMIC VALUES ///
 
-The "TIME" value is a string attached to key "t" in your Note Table.
-It contains the note's intended duration in terms of a fraction of a whole note.
+
+# Rhytmic Values
+
+The right value in your note table is still the "t" value, but you can using a string to represent various durations! It contains the note's intended duration in terms of a fraction of a whole note.
 
 The Basic Rhythms are:
     
@@ -237,7 +244,9 @@ Of note are:
     t = "6/8" represents a whole bar in 6/8 time.
     t = "3/8" represents a whole bar in 3/8 time.
 
-/ How do these even work? /
+
+
+# Simplified breakdown of how t values are converted
 
 Your song starts with an assumed distance of 0. (in terms of DST distance units). Every duration string I accounted for represents a specific value which is then added on top of the assumed distance. The assumed distance updates with each and every Note Table.
 
@@ -296,11 +305,10 @@ Triplets, or (`[3]`), up to Nonuplets (`[9]`) are supported for all the Basic Rh
 These next sections involve writing LUA tables. Please follow the examples' formatting carefully.
 
 
-/// RESTS AND TIES ///
+
+# Rests and Ties
     
-    
-The Basic Rhythms, even with all the Tuplets and Dotteds, still don't cover a lot of rhytmic possibilites!
-So to remedy that here's a way you can effectively create rests or tie a note's duration to be longer.
+The Basic Rhythms, even with all the Tuplets and Dotteds, still don't cover a lot of rhytmic possibilites! So to remedy that here's a way you can effectively create rests or tie a note's duration to be longer.
 
 For Rests:
 
@@ -346,11 +354,11 @@ Meaning Pitch `"D4"` is a 1/4th + 1/8th duration away from the start, or equival
     { 0,    t = "1/16"}, 
     { "D4", t = "1/8*"}, 
 
-We effectively turned pitch `"C4"` into a "1/4" + "1/16" duration, meaning the next nonzero pitch will be that duration away from pitch `"C4"`. In this case the next nonzero pitch is pitch `"D4"`, so it will be "1/4" + "1/16" duration away from pitch `"C4"`, or distance (0.25 + 0.0625, or 0.3125) away from the start.
+We effectively turned pitch `"C4"` into a "1/4" + "1/16" duration, meaning the next nonzero pitch will be that duration away from pitch `"C4"`. In this case the next nonzero pitch is pitch `"D4"`, so it will be "1/4" + "1/16" duration away from pitch `"C4"`, or distance (0.25 + 0.0625, or 0.3125) away from the start. Why use this? Because no sane duration in Western Music Theory is in itself equivalent to 1/4 + 1/16th, thus we have to combine 2 basic durations to get that value. You could probably do something dumb like a very obscure quarter tuplet for this, but at that point why *don't* you jut tie the note?
 
 
-/// CHORDS/SIMULTANEOUS VOICES ///
 
+# Chords and/or Simultaneous Voices
 
 More often than not you'll encounter music where multiple notes play at the same time. How do we achive this? To put it simply, for all the note tables EXCEPT THE LAST in the chord, set their t value to 0.Then for the last note, set its t value to whatever your need it.
 
