@@ -3,7 +3,7 @@ A way to somewhat make writing shell bell songs in Don't Starve Together (DST) a
 
 ## tl;dr, just get to the point you nerd
 
-To use this mod, simply subscribe to it on the Steam Workshop (not yet uploaded) or download this whole folder and place it within your DST mods folder. Under `scripts/songs/My Songs/` (or any folder/subfolders of your choosing really, just make sure they begin at `scripts/songs/`) create a new LUA file with these something along these lines:
+To use this mod, simply subscribe to it on the Steam Workshop (not yet uploaded) or download it from here and place it within your DST mods folder. Under `scripts/songs/My Songs/` (or any folder/subfolders of your choosing really, just make sure they begin at `scripts/songs/`) create a new LUA file with something along these lines:
 
 ```LUA
 local data = {}
@@ -32,7 +32,11 @@ return data
 > 
 > `data.notes` is a table containing many subtables, each of these subtables contains you pitch information and rhythm duration information.
 
-That's the basic formula for making a songfile. When you're done with making your song, go to `scripts/songlist.lua` and declare your filename under the correct `dir` key. 
+That's the basic formula for making a songfile. As long as you understand that you're creating LUA tables, and you have an idea of how your song goes, everything (in theory) will be fine. Rinse and repeat this process for however long your song is, or for however many parts/voices you want to include.
+
+Not shown in the above example are the capabilities to make rests, ties, simultaneous voices/chords and placement functions. Please see the respective sections for these parts. (Ctrl + F will be your best friend!)
+
+When you're done with making your song, go to `scripts/songlist.lua` and declare your filename under the correct `dir` key. 
 
 ```LUA
 local songlist = {}
@@ -51,6 +55,30 @@ dir["My Songs"] =
 After declaring your song, assuming everything went well, you can now call your songs by indexing the global table `mysongs` using the `data.title` string as the key. For example, `mysongs.examplesong`. 
 
 I would recommend against using spaces and special characters for your song's title, but as long as `data.title`  returns a literal string it should be fine. For example if i set `data.title = "Example Song!!!"` then I would have to index this file by using square brackets `[]` instead of the period `.`, like `mysongs["Example Song!!!"]`.
+
+## Actually spawning your song ingame
+
+Use the `c_shellsfromtable(song, startpos, placementfn, spacing_mult)` command.
+
+> `startpos` can be set to either `PlayerPos(num)` or `Coords(x,y,z)`. It can also just be omitted/set to `nil`
+> 
+> `placementfn` can be set to compass directions, such as N, NE, S, SW, and so on. It can also be omitted/set to `nil`.
+> 
+> `spacing_mult` can be set to a number, or omitted. It's likely your song's notes will be very close in distance to each other. You can set this parameter like `c_shellsfromtable(mysongs.goodday_piano, nil, nil, 4)`. It will increase the distance for all your song's notes. 
+
+Especially for spawning multiple song files at the same time, I recommend setting a local variable for each parameter that isn't `song`. Like:
+
+```LUA
+local here = Coords(90, 0, -300)
+local dir = NW
+local mult = 6
+c_shellsfromtable(whiplash_melody, here, dir, mult)
+here.z = -299
+c_shellsfromtable(whiplash_bass, here, dir, mult)
+here.z = -301
+c_shellsfromtable(whiplash_comp, here, dir ,mult)
+```
+That should be everything in a nutshell. If you didn't fully understand something, please read the in-depth breakdwon.
 
 # In-depth Breakdown
 
