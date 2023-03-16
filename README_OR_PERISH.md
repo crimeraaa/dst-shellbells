@@ -672,7 +672,7 @@ here.z = -327 -- right side
 c_shellsfromtable(mysongs.whiplash_bass, here, dir, mult)
 ```
 
-You may be confused about the `local dir = NW` and `local mult = 5`. I'm just about to get into that!
+> You may be confused about the `local dir = NW` and `local mult = 5`. I'm just about to get into that!
 
 ### placementfn
 
@@ -729,7 +729,9 @@ local here = Coords(90, 0, -300)
 c_shellsfromtable(mysongs.thelick, here, SE)
 ```
 
-This works because it's taking the coordinates from the `local here` variable, it's receiving those as input. Oh, I should probably mention the `spacing_mult`parameter just to complete the set!
+> This works because it's taking the coordinates from the `local here` variable, it's receiving those as input. 
+> 
+> Oh, I should probably mention the `spacing_mult`parameter just to complete the set!
 
 ### spacing_mult
 
@@ -746,7 +748,11 @@ here.z = -327 -- right side
 c_shellsfromtable(mysongs.whiplash_bass, here, dir, mult)
 ```
 
-I set `mult` to be `5`, so all my notes are gonna be 5 times farther from each other now. Each song is different, so I recommend you find a tempo you like through trial and error! Speaking of trial and error...
+> I set `mult` to be `5`, so all my notes are gonna be 5 times farther from each other now. 
+> 
+> Each song is different, so I recommend you find a tempo you like through trial and error! 
+> 
+> Speaking of trial and error...
 
 ### Removing all the Shell Bells
 
@@ -784,4 +790,6 @@ Basically if you call `ShellsRemove()` on its own, it'll remove every single she
 
 You can also specify a number as the argument within `ShellsRemove()` so you can remove everything within a certain radius.
 
-There's also `ShellsCount()` which is the exact same thing but it just doesn't remove the shells, so it can tell you how many shells you have in the world/in a radius without affecting your song.
+> There's also a command calls `ShellsCount()`. 
+> 
+> It's the exact same thing and accepts a radius an argument, but it just doesn't remove the shells, so it can tell you how many shells you have in the world/in a radius without affecting your song.
