@@ -1,11 +1,11 @@
 # dst-shellbells
 A way to somewhat make writing shell bell songs in Don't Starve Together a little bit more bearable.
 
-How the hell does this all even work?
+## How the hell does this all even work?
 
 This mod is intended to be used as a way for you to make your own LUA files that contain the song information you want to be turned into a long line of shell bells. 
 
-I'd recommend the following:
+## I'd recommend the following:
 
 1. Having a basic grasp of LUA syntax.
 2. A Code Editor.
@@ -25,7 +25,7 @@ Lastly, I'd encourage you to use some sort of counting system. I personally use 
 
 
 
-# THE BASICS 
+# The Basics
 
 Let's start from the very top. What is this mod even going to be used in? How does the shell bell song file even originally work? There's a console command (defined under, well, the base game's `scripts/consolecommands.lua`) which lets you spawn in shell bell songs. The command goes as follows: `c_shellsfromtable(song, startpos, placementfn, spacing_multiplier)`
 
@@ -98,7 +98,7 @@ I added comments to try to explain what's going on, but let me explain it again 
 
 
 
-# Number to Pitch Values
+## Number to Pitch Values
 
 Baritone    =   36-48, or C3-B3
 
@@ -110,7 +110,7 @@ The first value each note table has is always a number value, which represents a
 
 
 
-# The "t" values
+## The "t" values
 
 The second value each note table has a `t = (number)` value. This actually represents distance away from the starting point, which is by default your cursor's position. It's a way to loosely map "time" for lack of better word. There is no standardization here and this file is actually quite confusing to me because I can't see a pattern in the values immediately. But I can tell you this tune is in 3/4 time, in the key of G Minor. If we simply used
 
@@ -120,7 +120,7 @@ That's literally it! It will automatically spawn the song at your cursor's posit
 
 
 
-# My Thoughts
+## My Thoughts
 
 Here is the most basic way I could think of to create your own song files.
 
@@ -154,7 +154,7 @@ This took quite a bit of work for me to write, and it was only 7 notes! At least
 
 
 
-# CUSTOM SONG FILES
+# Custom Song Files
 
 Finally, this nerd is done explaining some dumb nerd stuff! Let's get to the actual good part! 
 
@@ -164,7 +164,7 @@ Let's start by creating a song file. I've already included a `template.lua` file
 
 
 
-# Creating your song file
+## Creating your song file
 
 Let's say I'm creating a file under the `scripts/songs/My Songs/` folder called `thelick.lua`.
 
@@ -193,7 +193,7 @@ Both using the dot `.` and the square brackets `[]` to index the table `mysongs`
 
 
 
-# How do note tables in the custom song files work?
+## How do note tables in the custom song files work?
   
 In general, under your `data.notes` table, you will be creating note tables within this scope to represent your notes with their associated duration. These are the "individual note tables". For example here are possible contents of `scripts/songs/My Songs/thelick.lua`
 
@@ -221,7 +221,7 @@ The comments `-- 1ST MEASURE` and all the rhythmic syllables like `--[[1]]` and 
 
 
 
-# Pitch Values
+## Pitch Values
 
 The left value in each individual note table is the `"PITCH"` value. Instead of using good old numbers 37-72, we can use strings! In general all pitches from C3-B5 are accepted. You can actually use numbers and I'm (fairly) certain it will work fine. But I greatly prefer to strings as they communicate the relevant musical information to me much quicker and I haven't tested it enough, I also personally don't like using it just because of how unreadable it can be.
 
@@ -241,7 +241,7 @@ You can actually go outside this range, provided that your entire song file **do
 
 
 
-# Rhythmic Values
+## Rhythmic Values
 
 The right value in your individual note table is still the `t` value, but you can using a string to represent various durations! It contains the note's intended duration in terms of a fraction of a whole note.
 
@@ -269,7 +269,7 @@ Of note are:
 
 
 
-# Simplified breakdown of how t values are converted
+## Simplified breakdown of how t values are converted
 
 Your song starts with an assumed distance of `0`. (in terms of DST distance units). Every duration string I accounted for represents a specific value which is then added on top of the assumed distance. The assumed distance updates with each and every Note Table.
 
@@ -302,6 +302,8 @@ The previous Note Table `"D4"` has duration 1/8 or 0.125, and distance right now
 Technically you don't need to set the t value for the very last note to anything as it's never used,
     but I think it's good practice to keep track of all your notes' rhythms.
 
+### Dotted Rhythms
+
 You can also add an asterisk `*` after the last character in each duration string to represent dotted rhythms. 
 
 For example:
@@ -312,6 +314,8 @@ For example:
 and so on.
 
 You can do the same for double dotted notes, just use 2 asterisks instead of 1. Triple dotted notes and above are not supported.
+
+### Tuplets 
 
 What about triplets and other tuplets? To do so, first enclose the number of the tuplet you'd like in brackets `[]` like so:
 
@@ -329,11 +333,11 @@ These next sections involve writing LUA tables. Please follow the examples' form
 
 
 
-# Rests and Ties
+## Rests and Ties
     
 The Basic Rhythms, even with all the Tuplets and Dotteds, still don't cover a lot of rhythmic possibilites! So to remedy that here's a way you can effectively create rests or tie a note's duration to be longer.
 
-For Rests:
+### For Rests:
 
     { 0,    t = "1/8" }, 
     { "C4", t = "1/8" },
@@ -346,7 +350,7 @@ Pitch `0` is at distance `0` effectively.
 
 Pitch `"C4"` is 0.125. So we got distance of `0` + previous duration `"1/8"` (or 0.125). `"C4"` is a 1/8th duration away from the start.
 
-For Ties:
+### For Ties:
 
 It's a similar idea to Rests, but instead of putting the dummy note table BEFORE the note you want it to apply to, simply put the dummy note table AFTER!
 
@@ -381,7 +385,7 @@ We effectively turned pitch `"C4"` into a "1/4" + "1/16" duration, meaning the n
 
 
 
-# Chords and/or Simultaneous Voices
+## Chords and/or Simultaneous Voices
 
 More often than not you'll encounter music where multiple notes play at the same time. How do we achive this? To put it simply, for all the note tables EXCEPT THE LAST in the chord, set their t value to 0.Then for the last note, set its t value to whatever your need it.
 
@@ -396,7 +400,7 @@ For example:
 
 The E major chord consisting of `"G#4"`, `"B4"` and `"E5"` all play at the same time because the all the notes in the chord, except the `"E5"` as it is the last in the chord, have their t values set to 0. The `"E5"` itself has t value of `"1/8"`, making the next nonzero pitch value that distance away from this chord. It's rather confusing but I hope you get the hang of it! This is a quirk of how my code determines time values by indexing the *previous* note table's duration. Oh the things I do for readability...
 
-# DECLARING YOUR SONG FILE
+## Declaring your song file
 
 So you finally finished making your song files! Now what? There's one last step we need to take. Go to `scripts/songlist.lua` and open it. The first blocks of code will look like this (comments are not included in this sample, but there are in the original file):
 
@@ -425,7 +429,7 @@ Assuming your song is located under the folder `scripts/songs/My Songs/`, simply
 	
 No need for the `.lua` extension. After all this, assuming everything went well with no errors, you should be able to call your song ingame! If this file `scripts/songs/My Songs/thelick.lua` did exist, then I could call it with `c_shellsfromtable(mysongs.thelick)`!
 
-# Declaring custom folders
+### Declaring custom folders
 
 What if you don't want to use the `My Songs` folder? What if you have a subfolder within `My Songs` or a subfolder within your new folder? It's not too hard! Just follow these instructions.
 
@@ -461,7 +465,7 @@ Just as an aside, the game actually checks filepaths with both slashes! It'll ch
 
 I should also mention, if you made a typo or got the wrong folder/file name, the game WILL crash upon startup (assuming the mod is enabled then). Make sure you do this carefully!
 
-# THE OTHER PARAMETERS
+## The Other Parameters
 
 Obviously simply spawning in your song directly isn't enough. It's incredibly likely the distances are too short, or it spawned in the wrong direction, or you want it to start at a very specific location. I have a few functions to accomodate for those.
 
@@ -469,7 +473,7 @@ For reference, this is what the command accepts again:
 
 	c_shellsfromtable(song, startpos, placementfn, spacing_mult)
 	
-# startpos
+### startpos
 
 As its variable name suggests, startpos is the exact position when your song starts. If you don't input anything for it or flat out type `nil`, it'll default to your cursor's position. To declare a custom startpos you need a table with 3 values, each with the keys `x`, `y`, and `z`. Like:
 
@@ -504,7 +508,7 @@ But one little gripe I have is that I hate having to type the `x`, `y` and `z` k
 	
 	
 	
-# PlayerPos(num)
+### PlayerPos(num)
 
 The function `PlayerPos(player_num)` gets the position of a player and returns a table of those coordinates. The reason we can't just use `ThePlayer.Transform:GetWorldPosition` is because it just returns 3 numbers! 
 
@@ -526,7 +530,7 @@ Or you can even just declare a new value for them!
 	here.x = 100
 	here.z = -200
 	
-# Coords(x,y,z)
+### Coords(x,y,z)
 The function `Coords(x,y,z)` allows for a very fine tuning of coordinates. It takes 3 inputs and assigns them each to the respective coordinate value and returns those coordinate values in a table with x,y,z keys. 
 
 For example I can say `local here = Coords(90, 0, -300)` and `here` will automatically be a table with those 3 values set to `x`, `y` and `z` keys respecitvely! I can then call the local table `here` for the `startpos` parameter like so:
@@ -559,7 +563,7 @@ This is especially handy when you're spawning in multiple songs but you can to s
 	
 You may be confused about the `local dir = NW` and `local mult = 5`. I'm just about to get into that!
 
-# placementfn
+### placementfn
 
 `placementfn` is a function that determines the way your shells are lined up. Here's how it's defined under `consolecommands.lua`:
 
@@ -610,7 +614,7 @@ Unlike the previous functions, you don't need to invoke the function using paren
 	
 This works because it's taking the coordinates from the `local here` variable, it's receiving those as input. Oh, I should probably mention the `spacing_mult`parameter just to complete the set!
 
-# spacing_mult
+### spacing_mult
 
 It's exactly what it says. Whatever number you input here is multiplied to all the `t` values. I always use this because my code on its own sets the note durations to be a super close to each other. I generally declare a local variable set to a number as my `spacing_mult`, especially if I'm spawning in multiple songfiles and I want to fine tune the tempo quickly. Let's look again at my "Whiplash" arrangement:
 
@@ -625,7 +629,7 @@ It's exactly what it says. Whatever number you input here is multiplied to all t
 	
 I set `mult` to be `5`, so all my notes are gonna be 5 times farther from each other now. Each song is different, so I recommend you find a tempo you like through trial and error! Speaking of trial and error...
 
-# Removing all the Shell Bells
+### Removing all the Shell Bells
 
 You may find yourself spawning in your song then immediately thinking "I need to change something real quick!". I know that happened to me a lot in creating this mod, so I made this simple function:
 
