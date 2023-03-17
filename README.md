@@ -52,9 +52,11 @@ dir["My Songs"] =
 ```
 > In general I'd recommend you to store your own songfiles under the `scripts/songs/My Songs` folder. However, if you choose to use a different folder or use a subfolder within another folder, then be sure to declare the correct folder path first.
 >
-> DST's code typically uses forward `/` slashes for filepaths. If you have a new folder like `scripts/songs/My Songs/Rock/` for example, then create a new table `dir["My Songs/Rock"]` without the ending forward `/` slash.
+> DST's code typically uses forward `/` slashes for filepaths because the back `\` slash is an escape character in LUA. 
 > 
-> My code assumes your folder's path begins at `songs/`, and will always append a forward `/` slash at the end of your folder's path. 
+> If you have a new folder like `scripts/songs/My Songs/Rock/` for example, then create a new table `dir["My Songs/Rock"]`. The ending slash is optional as my code can adapt to if it's present or not.
+> 
+> My code assumes your folder's path begins at `songs/`, so please put all your folders and files there!
 > 
 > `scripts/` is not specified in the folder's path as I loop through the declared folder paths and call the `require` function. In DST, `require` always begins its search in the `scripts` folder. 
 
@@ -549,7 +551,7 @@ What's going on here?
 > 
 > Meaning Pitch `"D4"` is a 1/4th + 1/8th duration away from the start, or equivalent to a dotted 1/4th or `"1/4*"`! 
  
-Of course in *this* case you could just > use a `"1/4*"` duration. But this helps you achieve super specific durations! Like...
+Of course in *this* case you could just use a `"1/4*"` duration. But this helps you achieve super specific durations! Like...
 
 ```LUA
 data.notes =
@@ -601,6 +603,7 @@ dir["My Songs"] =
 ```
 
 Assuming your song is located under the folder `scripts/songs/My Songs/`, simply declare your **filename** as a string. I have to stress again, you should use the **filename, not the `data.title` value inside of your file.** This is because if your `data.title` value is a different name than your filename, then you'll have to be careful which one to declare. In my example file `thelick.lua`, the `data.title` value is also set to `thelick` so no need to worry there. I can declare my file this way:
+
 ```LUA
 local songlist = {} 
 local directory = {}
@@ -614,7 +617,9 @@ dir["My Songs"] =
 }
 ```
 
-No need for the `.lua` extension. After all this, assuming everything went well with no errors, you should be able to call your song ingame! If this file `scripts/songs/My Songs/thelick.lua` did exist, then I could call it with `c_shellsfromtable(mysongs.thelick)`!
+No need for the `.lua` extension, as the game will later on think you're trying to call something like `thelick.lua.lua`. Although I added a little check in this same file to remove instances of `.lua` should any be found, so if you include it you'll still be fine!
+
+After all this, assuming everything went well with no errors, you should be able to call your song ingame! If this file `scripts/songs/My Songs/thelick.lua` did exist, then I could call it with `c_shellsfromtable(mysongs.thelick)`!
 
 ### Declaring custom folders
 
@@ -648,13 +653,59 @@ dir["My Songs/Rock"] =
 }
 ```
 
-Notice how the the parent folder has a forward slash `/` but the last folder in the path does not. My code automatically adds a slash at the end of each key for the `dir` table.
+Since I'm on Windows 10, my system actually uses back `\` slashes. Although I do know different systems may use the forward `/` slash. 
 
-Since I'm on Windows 10, my system actually uses back `\` slashes. Although I do know different systems may use the forward `/` slash. DST's code usually uses forward `/` slashes so let's go with that just so everybody is on the same page. This likely because LUA uses the back `\` slash as an escape character, so if we wanted to use back slashes in strings for filepaths it would actually look like `My Songs\\Rock` because we have to escape with the 1st back slash, then the character right after that is the actual back slash that will appear in the string.
+However, DST's code usually uses forward `/` slashes. Let's go with that just so everybody is on the same page. 
 
-Just as an aside, the game actually checks filepaths with both slashes! It'll check your file path with one kind of slash at first, for example the forward `/` slash. Then if it doesn't find any matching files with that slash, it'll look in the same path but substitute the forward `/` slash with the back `\` slash. 
+> This likely because LUA uses the back `\` slash as an escape character, 
+> so if we wanted to use back slashes in strings for filepaths it would actually look like `My Songs\\Rock`.
+>
+> That's because we have to escape with the 1st back slash, then the character right after that is the actual back slash that will appear in the string.
 
 I should also mention, if you made a typo or got the wrong folder/file name, the game WILL crash upon startup (assuming the mod is enabled then). Make sure you do this carefully!
+
+> Just as an aside, the game actually checks filepaths with both slashes! 
+> It'll check your file path with one kind of slash at first. 
+> For example it will check the filepath using the forward `/` slash. 
+> Then if it doesn't find any matching files with that slash, 
+> it'll look in the same path but substitute the forward `/` slash with the back `\` slash. 
+
+
+
+> For the curious, there's a bit of work done to allow error-proofing. Check it:
+```LUA
+for name, contents in pairs(directory) do
+    for _, file in pairs(contents) do
+
+        file = string.gsub(file, ".lua", "") -- error proofing just so folks get less headaches
+
+        path = name.."/"..file
+
+        if string.find(name, "/", -1) or string.find(name, "\\", -1) then   
+            path = name..file -- accomodate if user appended any kind of slash at end of folder path
+        end
+
+        table.insert(songlist, path)
+    end
+end
+
+
+for i,path in pairs(songlist) do
+    local address = "songs/"..path 
+    local invalid = address.." is missing a valid"
+    --print("Checking "..address..".") 
+    local songfile = require(address) 
+    if songfile.title == nil or not (type(songfile.title) == "string") then
+        print(invalid.." data.title value!") -- prevent valid songfiles with invalid values from flat out crashing us.
+    elseif songfile.notes == nil or not (type(songfile.notes) == "table") then
+        print(invalid.." data.notes table!") -- but keep compiling the rest of the songfiles.
+    else
+        --print(songfile.title.." is valid!")
+        songlist[i] = songfile  -- overwrite this index so we can return table songlist directly
+    end
+end
+```
+>
 
 ## The Other Parameters
 
@@ -839,9 +890,9 @@ for i, notes in ipairs(song) do
 	else
 		applied_spawning_pos = placementfn(spawning_pos, notes.t * spacing_multiplier)
 	end
--- rest of the function is cut off for brevity.
+-- rest of the function in this sample is cut off for brevity.
 ``` 
-> Oh, I should probably mention the `spacing_mult`parameter just to complete the set!
+> Oh, I should probably mention the `spacing_mult` parameter just to complete the set!
 
 ### spacing_mult
 
@@ -864,35 +915,53 @@ c_shellsfromtable(mysongs.whiplash_bass, here, dir, mult)
 > 
 > Speaking of trial and error...
 
-### Removing all the Shell Bells
+### Removing and Counting Shell Bells
 
 You may find yourself spawning in your song then immediately thinking "I need to change something real quick!". I know that happened to me a lot in creating this mod, so I made this simple function:
 
 ```LUA
-function ShellsRemove(radius)     -- this command is very robust. be careful with how you use it!
-	local ents = {}
-	if radius ~= nil then
-		local x,y,z = ThePlayer.Transform:GetWorldPosition()
-		ents = TheSim:FindEntities(x,y,z, radius)
-	else
-		ents = Ents
-	end
+local function GetShells(radius, remove)
+    local ents = {}
+    local range = ""
 
-	local count = 0
-	for k,v in pairs(ents) do
-		if (v.prefab == "singingshell_octave3") or 
-		(v.prefab == "singingshell_octave4") or 
-		(v.prefab == "singingshell_octave5") then
-			v:Remove()
-			count = count + 1
-		end
-	end
+    if radius == nil then
+        range = GetShard()
+        ents = Ents
+    else
+        assert(type(radius) == "number", "Please input a NUMBER value!")
+        range = "a "..radius.." unit radius"
 
-	if radius ~= nil then
-		print(string.format("We successfully removed [%d] shell bells in a %d unit radius.", count, radius))
-	else
-		print(string.format("We successfully removed [%d] shell bells from this Shard.", count))
-	end
+        local x,y,z = ThePlayer.Transform:GetWorldPosition()
+        ents = TheSim:FindEntities(x,y,z, radius)
+    end
+
+    local count = 0
+    local shell = "singingshell_octave"
+    for k,v in pairs(ents) do
+        if (v.prefab == shell.."3") or (v.prefab == shell.."4") or (v.prefab == shell.."5") then
+            if remove == true then
+                v:Remove()
+            end
+            count = count + 1
+        end
+    end
+
+    local msg = string.format("We have [%d] shell bells in %s.", count, range)
+
+    if remove == true then
+        msg = string.gsub(msg, "have", "removed")
+    end
+
+    print(msg)
+    return
+end
+
+function ShellsRemove(radius)     -- this command is very robust. be careful with how you use it!        
+    GetShells(radius, true)     -- 2nd argument must be a boolean, see GetShells declaration above.
+end
+
+function ShellsCount(radius)
+    GetShells(radius)
 end
 ```
 
@@ -900,6 +969,4 @@ Basically if you call `ShellsRemove()` on its own, it'll remove every single she
 
 You can also specify a number as the argument within `ShellsRemove()` so you can remove everything within a certain radius.
 
-> There's also a command calls `ShellsCount()`. 
-> 
-> It's the exact same thing and accepts a radius an argument, but it just doesn't remove the shells, so it can tell you how many shells you have in the world/in a radius without affecting your song.
+The same principle applies for `ShellsCount()`, just that instead of removing shells it jut counts them.
