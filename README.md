@@ -65,7 +65,9 @@ The right value of each individual note table is a string attached to key `t`, w
 
 This system goes from `t = "4/4"` down to `t = "1/64"`.
 
-You can add an asterisk `*` to create dotted notes, like `t = "1/4*"`. You can also add 2 asterisks `**`, like `t = "4/4"**`.
+You can add an asterisk `*` to create dotted notes, like `t = "1/4*"`. 
+
+You can also add 2 asterisks `**`, like `t = "4/4"**`.
 
 Tuplets can be wrriten by prefixing the tuplet number in square brackets at the start of the string. 
 
