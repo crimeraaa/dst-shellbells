@@ -36,7 +36,34 @@ return data
 
 That's the basic formula for making a songfile. As long as you understand that you're creating LUA tables, and you have an idea of how your song goes, everything (in theory) will be fine. Rinse and repeat this process for however long your song is, or for however many parts/voices you want to include.
 
-Not shown in the above example are the capabilities to make rests, ties, simultaneous voices/chords and placement functions. Please see the respective sections for these parts. (Ctrl + F will be your best friend!)
+Not shown in the above example are the capabilities to make rests, ties, simultaneous voices/chords and placement functions. Please see the this respository's respective Wiki pages.
+
+### Pitch Information
+
+The left value of each individual note table is a string, written as the Letter Name + Octave Number. For example:
+```LUA
+data.notes =
+{
+	{ "C4", t = "1/4}.
+}
+```
+In general Shell Bells are limited to the range of pitches `"C3"` up to `"B5"`. Accidentals are supported.
+
+Sharps can be writen like `"F#3"`. Flats can be written like `"Bb4"`. 
+
+`"E#"`, `"Fb"`, `"B#"` and `"Cb"` are also allowed. However, double sharps and double flats are not supported.
+
+### Rhythmic Durations
+
+The right value of each individual note table is a string attached to key `t`, written as the fraction representation of the note.
+
+`t = "4/4"` represents a whole note. `t = "1/4"` represents a quarter note. `t = "1/8"` represents an eighth note, and so on. This system goes from `t = "4/4"` down to `t = "1/64"`.
+
+You can add an asterisk `*` to create dotted notes, like `t = "1/4*"`. You can also add 2 asterisks `**`, like `t = "4/4"**`.
+
+Tuplets can be wrriten by prefixing the tuplet number in square brackets at the start of the string. `t = "[3]1/4"` is a triplet quarter note, `t = "[5]1/8"` is a triplet eighth note. This system goes from Triplets `"[3]"` up to Nonuplets `"[9]"`.
+
+### Declaring Your Song File
 
 When you're done with making your song, go to `scripts/songlist.lua` and declare your filename under the correct `dir` key. 
 
