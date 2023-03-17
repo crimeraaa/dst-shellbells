@@ -44,7 +44,7 @@ The left value of each individual note table is a string, written as the Letter 
 ```LUA
 data.notes =
 {
-	{ "C4", t = "1/4}.
+	{ "C4", t = "1/4},
 }
 ```
 In general Shell Bells are limited to the range of pitches `"C3"` up to `"B5"`. Accidentals are supported.
@@ -57,11 +57,25 @@ Sharps can be writen like `"F#3"`. Flats can be written like `"Bb4"`.
 
 The right value of each individual note table is a string attached to key `t`, written as the fraction representation of the note.
 
-`t = "4/4"` represents a whole note. `t = "1/4"` represents a quarter note. `t = "1/8"` represents an eighth note, and so on. This system goes from `t = "4/4"` down to `t = "1/64"`.
+`t = "4/4"` represents a whole note. 
+
+`t = "1/4"` represents a quarter note. 
+
+`t = "1/8"` represents an eighth note, and so on. 
+
+This system goes from `t = "4/4"` down to `t = "1/64"`.
 
 You can add an asterisk `*` to create dotted notes, like `t = "1/4*"`. You can also add 2 asterisks `**`, like `t = "4/4"**`.
 
-Tuplets can be wrriten by prefixing the tuplet number in square brackets at the start of the string. `t = "[3]1/4"` is a triplet quarter note, `t = "[5]1/8"` is a triplet eighth note. This system goes from Triplets `"[3]"` up to Nonuplets `"[9]"`.
+Tuplets can be wrriten by prefixing the tuplet number in square brackets at the start of the string. 
+
+`t = "[3]1/4"` is a triplet quarter note, 
+
+`t = "[5]1/8"` is a septuplet eighth note. 
+
+`t = "[6]1/16"` is a sextuplet sixteenth note.
+
+This system goes from Triplets `"[3]"` up to Nonuplets `"[9]"`.
 
 ### Declaring Your Song File
 
