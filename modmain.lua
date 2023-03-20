@@ -2,7 +2,7 @@ local MOD_ENV = env
 local _G = GLOBAL
 _G.setfenv(1, _G) 
 
-local prettyname = "[009] Shell Bell Music:"
+local prettyname = "Shell Bell Music:"
 print(prettyname.." Begin compiling all songs!")
 
 mysongs = {}    -- instead of a million insividual global variables, index this new global table instead
@@ -28,8 +28,7 @@ EXAMPLE:
     c_shellsfromtable(mysongs.whiplash_melody, here, dir, mult)
 ]]
 
-if TheNet and ((TheNet:GetIsServer() and TheNet:GetServerIsDedicated()) or
-(TheNet:GetIsClient() and not TheNet:GetIsServerAdmin())) then
+if TheNet and not TheNet:GetIsServerAdmin() then
     print(prettyname.." You do not have admin permissions on this server. Returning.")
     return
 end
@@ -93,26 +92,31 @@ local function GetShard()
     local shard = "this shard"
     if TheWorld:HasTag("forest") then
         shard = "Surface"
-    elseif TheWorld:HasTag("caves") then
+    elseif TheWorld:HasTag("cave") then
         shard = "Caves"
     elseif TheWorld:HasTag("island") then
         shard = "Shipwrecked"
     elseif TheWorld:HasTag("volcano") then
         shard = "Volcano"
     end
-    return shard
+    return string.upper(shard)
 end
 
 local function GetShells(radius, remove)
     local ents = {}
-    local range = ""
+    local range = nil
+    local invalid = prettyname.." Radius input '%s'"
+    local world = GetShard()
 
     if radius == nil then
-        range = GetShard()
         ents = Ents
     else
-        assert(type(radius) == "number", "Please input a NUMBER value!")
-        range = "a "..radius.." unit radius"
+        if not (type(radius) == "number") then
+            radius = tostring(radius)
+            print(string.format(invalid.." is not a number value!", radius))
+            return
+        end
+        range = string.format("in a '%d' unit radius", radius)
 
         local x,y,z = ThePlayer.Transform:GetWorldPosition()
         ents = TheSim:FindEntities(x,y,z, radius)
@@ -129,10 +133,16 @@ local function GetShells(radius, remove)
         end
     end
 
-    local msg = string.format("We have [%d] shell bells in %s.", count, range)
+    local success = prettyname.." %s - We found '%d' shell bells"
+    local msg = ""
+    if range == nil then
+        msg = string.format(success..".", world, count)
+    else
+        msg = string.format(success.." %s.", world, count, range)
+    end
 
     if remove == true then
-        msg = string.gsub(msg, "have", "removed")
+        msg = string.gsub(msg, "found", "removed")
     end
 
     print(msg)
@@ -149,7 +159,7 @@ end
 
 
 -- FOR MY TESTING WORLD ONLY, COMMENT OUT ON PUBLICATION
-
+--[[
 HomeTime = function()
     c_gonext("sewing_mannequin")
     return
@@ -157,3 +167,4 @@ end
 
 PlayFootstep = function()
 end
+]]
