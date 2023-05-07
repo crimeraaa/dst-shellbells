@@ -1,5 +1,7 @@
-name = "Shell Bell Music (Local)"
--- name = "Shell Bell Music"
+local is_local = true
+local append = (is_local and " (Local") or ""
+
+name = "Shell Bell Music"..append
 author = "crimeraaa"
 description = [[You wanna listen to some tunes?
 
@@ -7,7 +9,7 @@ This mod intended to be used as a template for you to create your own shell bell
 Please look in the mod files and create your own song file inside the "scripts/My Songs" folder.
 If you'd like, you can refer to the example song files for help. Also see the modmain for functions you can use that may be helpful.]]
 
-version = "1.0.1"
+version = "1.1.0"
 api_version = 10 
 
 dst_compatible = true

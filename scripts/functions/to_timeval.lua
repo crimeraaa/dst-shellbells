@@ -1,203 +1,201 @@
--- CREATION OF STRING PITCHES TO PITCH VALUES TABLE
+local pitches = require("functions/pitches")
+local rhythms = require("functions/rhythms")
 
-local letternames = {}
--- PRIMARY NOTE NAMES           -- ENHARMONICS
-letternames["C"]    =   1       letternames["B#"]   =   1
-letternames["C#"]   =   2       letternames["Db"]   =   2
-letternames["D"]    =   3
-letternames["D#"]   =   4       letternames["Eb"]   =   4
-letternames["E"]    =   5       letternames["Fb"]   =   5
-letternames["F"]    =   6       letternames["E#"]   =   6
-letternames["F#"]   =   7       letternames["Gb"]   =   7
-letternames["G"]    =   8
-letternames["G#"]   =   9       letternames["Ab"]   =   9
-letternames["A"]    =   10      
-letternames["A#"]   =   11      letternames["Bb"]   =   11
-letternames["B"]    =   12      letternames["Cb"]   =   12
--- i'll allow E#/Fb and B#/Cb, but double flats and sharps are just... no.
+local mod_err = "[Shell Bell Music] Error: %s"
+local err_msg = string.format(
+    mod_err, 
+    [[For song file '%s', we failed to convert %s "%s"!
+    It has %s "%s" located at data.notes index %d."]]
+)
 
-local pitches = {}
-
-local function ToOctave()
-    for letter,pitchnum in pairs(letternames) do
-        for octave=1, 6 do
-            pitches[letter..octave] = pitchnum + (octave * 12)
-        end
-    end
-    return pitches
+---@param title string
+---@param typeof1 string
+---@param val1 string|integer
+---@param typeof2 string
+---@param val2 string|integer
+---@param tbl_index integer
+local function FailWarning(title, typeof1, val1, typeof2, val2, tbl_index)
+    local err = string.format(
+        err_msg, 
+        title, 
+        typeof1, val1, 
+        typeof2, val2, 
+        tbl_index
+    )
+    print(err)
 end
 
-pitches = ToOctave()
+-- Output FNs
 
--- CREATION OF STRING TIME DURATIONS TO TIME VALUES TABLE
-
-local base = 1/32
-
-local basic_vals = {}
--- BASIC TIME VALUES
-basic_vals["4/4"]   = 64    -- whole
-basic_vals["2/4"]   = 32    -- half
-basic_vals["1/4"]   = 16    -- quarter
-basic_vals["1/8"]   = 8     -- eighth
-basic_vals["1/16"]  = 4     -- sixteenth
-basic_vals["1/32"]  = 2     -- thirty second
-basic_vals["1/64"]  = 1     -- sixty fourth
-
--- TIME SIGNATURE BAR VALUES FOR EASE OF USE
-local timesigs = {} -- separate table so that we don't get the dotteds and tuplets of say, 5/4 cause that's stupid
-
--- NON 4/4 SIMPLE TIME SIGS
-timesigs["6/4"]  = 96
-timesigs["3/2"]  = 96
-timesigs["2/2"]  = 64    -- i mean, just in case? i have seen some music like this
-timesigs["3/4"]  = 48 
-
--- COMPOUND TIME SIGS
-timesigs["12/8"] = 96
-timesigs["9/8"]  = 72 
-timesigs["6/8"]  = 48
-timesigs["4/8"]  = 36 
-timesigs["3/8"]  = 24 
-
---IRREGULAR TIME SIGS
-timesigs["10/4"] = 160
-timesigs["9/4"]  = 144
-timesigs["7/4"]  = 112 
-timesigs["6/4"]  = 96 
-timesigs["5/4"]  = 80 
-timesigs["7/8"]  = 56 
-timesigs["5/8"]  = 40 
-
-local rhythms = {}  -- final table of strings with their respective converted time values
-
-local function Basic()
-    for k,v in pairs(basic_vals) do
-        rhythms[k] = v * base
-    end
-end
-
-local function Dotteds() 
-    for k,v in pairs(basic_vals) do
-        rhythms[k.."*"] = v * base * 3/2  --create a new key with a new value?
-        rhythms[k.."**"]= v * base * 3/2 * 3/2  -- double dotteds, juuuust in case.
-        -- if you want triple dotteds you're wrong and you should feel bad
-    end
-end
-
-
-local function Tuplets()
-    for k,v in pairs(basic_vals) do
-        for i=3, 9 do    -- all kinds of semi-reasonable tuplets for all kinds of rhythmic feels.
-            rhythms["["..i.."]"..k] = v * base * 2/i
-        end
-    end
-end
-
-local function TimeSigs()
-    for k,v in pairs(timesigs) do
-        rhythms[k] = v * base
-    end
-end
-local function Converted()
-    Basic()
-    Dotteds()
-    Tuplets()
-    TimeSigs()
-    return rhythms
-end
-
-rhythms = Converted() 
-
--- FUNCTIONS TO CONVERT USER SONGFILE TO SHELL BELL NOTE TABLE
-
+---@param value string|integer
+---@param transpose integer
+---@return integer|nil
 local function OutputPitch(value, transpose)
     if type(value) == "number" then
-        value = value + transpose
-        return value
-    elseif type(value) == "string" then
-        for pitchname, pitchnum in pairs(pitches) do
-            if pitchname == value then
-                value = pitchnum + transpose
-                return value
-            end
-        end    
+        return value + transpose
     end
-    return nil -- for when your pitch string is invalid
+    
+    if pitches[value] then
+        return pitches[value] + transpose
+    end
+    -- if pitches[value] didn't pass, that means value was invalid
+    return nil
 end
 
+---@param mainfn table
+---@param subfn table
+---@param pitch_k integer
+---@param pitch_v string|integer
+local function EvaluatePitchValue(mainfn, subfn, pitch_k, pitch_v)
+    subfn.index = pitch_k
+    if pitch_v == 0 or pitch_v == "0" then
+        subfn.dummy_tbl[subfn.index] = 0    
+        return
+    end
 
-local function OutputTime(song, note_table, value, prev_beat, distance)
-    if type(value) == "number" then
-        if prev_beat == 0 then
-            return 0
-        elseif prev_beat > 0 then
-            local prev = song[prev_beat].t
-            distance = distance + prev
-            return distance
-        end
-    elseif type(value) == "string" then
-        for rhythm_name, duration in pairs(rhythms) do -- convert all our time values to their respective number.
-            if rhythm_name == value then
-                note_table.t = duration     -- NEEDED for the "prev" variable in the next block.
-            end
-        end
-        if type(note_table.t) == "string" then
-            return nil -- for when your rhythm string is invalid
-        elseif prev_beat == 0 then
-            return 0
-        elseif prev_beat > 0 then
-            local prev = song[prev_beat].t
-            distance = distance + prev
-            return distance
-        end
+    local pitch = OutputPitch(pitch_v, mainfn.transpose)
+    -- will tell you what went wrong, but won't force a crash (such as in assert)
+    if pitch == nil then
+        FailWarning(
+            mainfn.title, 
+            "pitch value", 
+            pitch_v,  
+            "t-value", 
+            subfn.current_tbl.t, 
+            subfn.beat_num
+        )
+        return
+    end
+
+    subfn.dummy_tbl[subfn.index] = pitch  -- needed as we'll use the whole table later
+end
+
+---@param mainfn table
+---@param subfn table
+---@return integer
+local function NumberTimeVal(mainfn, subfn)
+    if subfn.prev_beat == 0 then
+        return 0
+    else -- implied nonzero t value, this will mess up if you do use negative numbers
+        local prev = mainfn.song[subfn.prev_beat].t
+        return mainfn.distance + prev
     end
 end
 
-
-function TimeVal(title, song, transpose)   -- upon modimport this will be the only function that can be called per song file.
-    --print("Compiling "..title..".")
-    local song_error = "Error compiling "..title.."!"
-
-    local notes = {} -- this is the final table of {pitch#, t = ##} subtables we'll return
-    local distance = 0
-
-    for beat_num, note_table in pairs(song) do
-        local prev_beat = beat_num - 1
-        local _note_table = {}  -- duplicate table to avoid modifying the original note_table directly.
-        local pitch = 0
-        local index = 0
-        for key, value in pairs(note_table) do
-            if key ~= "t" and (value == 0 or value == "0") then
-                index = key
-                _note_table[index] = 0
-            elseif key ~= "t" then
-                index = key
-                local pitch = OutputPitch(value, transpose)
-                if pitch == nil then -- error proofing and to avoid the game just flat out crashing on you
-                    print(song_error)
-                    print(string.format("Failed to convert pitch \"%s\".\nIt has t-value \"%s\", located at note table #%d.", value, note_table.t, beat_num))
-                    return
-                end
-                _note_table[index] = pitch  -- needed as we'll use the whole table later
-            elseif key == "t" then
-                distance = OutputTime(song, note_table, value, prev_beat, distance)
-                if distance == nil then -- error proofing and to avoid the game just flat out crashing on you
-                    print(song_error)
-                    print(string.format("Failed to convert rhythm \"%s\".\nIt has pitch-value \"%s\", located at note table #%d.", value, note_table[index], beat_num))
-                    return
-                elseif _note_table[index] == 0 then
-                    -- for rests, don't do anything. it's as shrimple as that!
-                    -- the distance value will still update normally. it's just that the-
-                    -- _note_table table, isn't, well, inserted.
-                else
-                    _note_table.t = distance
-                    table.insert(notes, _note_table)
-                end
-            end
-        end
+---@param mainfn table
+---@param subfn table
+---@param time_v string
+---@return integer|nil
+local function StringTimeVal(mainfn, subfn, time_v)
+    if rhythms[time_v] then
+        -- Needed for the prev value in NumberTimeVal
+        subfn.current_tbl.t = rhythms[time_v]
     end
-    --print("Successfully compiled "..title.."!") 
-    return notes
+    
+    -- If rhythms[time_v] didn't pass and subfn.current_tbl.t wasn't changed, 
+    -- that means it was invalid so return nil
+    if type(subfn.current_tbl.t) == "string" then
+        return nil
+    end
+    
+    return NumberTimeVal(mainfn, subfn)
+end
+
+---@param mainfn table
+---@param subfn table
+---@param time_v string|integer
+---@return integer|nil
+local function OutputTime(mainfn, subfn, time_v)
+    -- mainfn.song, subfn.current_tbl, time_v, subfn.prev_beat, mainfn.distance
+    if type(time_v) == "number" then
+        return NumberTimeVal(mainfn, subfn)
+    elseif type(time_v) == "string" then
+        return StringTimeVal(mainfn, subfn, time_v)
+    end
+end
+
+---@param mainfn table
+---@param subfn table
+---@param time_v string|integer
+local function EvaluateTimeValue(mainfn, subfn, time_v)
+    mainfn.distance = OutputTime(mainfn, subfn, time_v)
+    if mainfn.distance == nil then
+        FailWarning(
+            mainfn.title,
+            "rhythm", 
+            time_v, 
+            "pitch-value", 
+            subfn.current_tbl[subfn.index], 
+            subfn.beat_num
+        )
+        return
+    end
+    
+    if subfn.dummy_tbl[subfn.index] == 0 then
+        --[[ for rests, don't do anything. it's as shrimple as that!
+            the distance value will still update normally. it's just that the-
+            subfn.dummy_tbl table, isn't, well, inserted. ]]
+    else
+        subfn.dummy_tbl.t = mainfn.distance
+        table.insert(mainfn.notes, subfn.dummy_tbl)
+    end
+end
+
+---@param mainfn table
+---@param subfn table
+---@param key string|integer
+---@param value string|integer
+local function NoteTableKey(mainfn, subfn, key, value)
+    if key == 1 then
+        EvaluatePitchValue(mainfn, subfn, key, value)
+    elseif key == "t" then
+        EvaluateTimeValue(mainfn, subfn, value)
+    end
+end
+
+---@param mainfn table
+---@param subfn table
+local function EvaluateNoteTable(mainfn, subfn)
+    ---@param key string|integer
+    ---@param value string|integer
+    for key, value in pairs(subfn.current_tbl) do
+        NoteTableKey(mainfn, subfn, key, value)
+    end
+end
+
+---@param title string
+---@param song table
+---@param transpose integer
+---@return table mainfn.notes
+function TimeVal(title, song, transpose)
+    -- print("Compiling "..title..".")
+
+    local mainfn = 
+    {
+        title = title,
+        song = song,
+        transpose = transpose or 0,
+        notes = {}, -- This is the final table we'll return
+        distance = 0,
+    }
+
+    ---@param i integer
+    ---@param tbl table
+    for i, tbl in pairs(mainfn.song) do
+        local subfn = 
+        {
+            beat_num = i,
+            prev_beat = i - 1,
+            current_tbl = tbl,
+            dummy_tbl = {},  -- duplicate table to avoid modifying the original note_table directly.
+            pitch = 0,
+            index = 0,
+        }
+
+        EvaluateNoteTable(mainfn, subfn)
+    end
+    -- print("Successfully compiled "..title.."!") 
+    return mainfn.notes
 end
 
 return TimeVal
