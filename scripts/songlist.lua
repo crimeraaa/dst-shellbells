@@ -1,7 +1,5 @@
-local songlist = {}
-
 -- This is where you'll define your folders.
-local directory = {}  T
+local directory = {} 
 -- Use directory["My Folder's Path"] when declaring new subtables.
 
 directory["My Songs"] = {
@@ -43,37 +41,37 @@ directory["7-4 Examples"] = {
     "whiplash_melody",
 }
 
---
-
+local songlist = {}
 for name, contents in pairs(directory) do
     for _, file in pairs(contents) do
         -- error proofing just so folks get less headaches
         file = string.gsub(file, ".lua", "") 
 
-        path = name.."/"..file
-
+        local path
         if string.find(name, "/", -1) or string.find(name, "\\", -1) then   
             -- accomodate if user appended a slash at end of folder path
             path = name..file 
+        else
+            path = name.."/"..file
         end
 
         table.insert(songlist, path)
     end
 end
 
-
-for i,path in pairs(songlist) do
+for i, path in pairs(songlist) do
     local address = "songs/"..path 
     local invalid = address.." is missing a valid"
-    --print("Checking "..address..".") 
     local songfile = require(address) 
     if songfile.title == nil or not (type(songfile.title) == "string") then
-        print(invalid.." data.title value!") -- prevent valid songfiles with invalid values from flat out crashing us.
+        -- prevent valid songfiles with invalid values from flat out crashing us.
+        print(invalid.." data.title value!") 
     elseif songfile.notes == nil or not (type(songfile.notes) == "table") then
-        print(invalid.." data.notes table!") -- but keep compiling the rest of the songfiles.
+        -- but keep compiling the rest of the songfiles.
+        print(invalid.." data.notes table!") 
     else
-        --print(songfile.title.." is valid!")
-        songlist[i] = songfile  -- overwrite this index so we can return table songlist directly
+        -- overwrite this index so we can return table songlist directly
+        songlist[i] = songfile  
     end
 end
 
