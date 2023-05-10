@@ -61,9 +61,7 @@ local function EvaluatePitchVal(pitch_v)
 end
 
 -- Modify mainfn.song table directly.
-local function ConvertVals(mainfn, song, beat_num, note_tbl, error_count)
-    local prev_beat = beat_num - 1
-    
+local function ConvertVals(mainfn, song, beat_num, note_tbl, error_count)    
     -- note_tbl[1] and note_tbl.t *should* be constant keys, so don't loop
     local pitch_v = EvaluatePitchVal(note_tbl[1])
     local time_v = EvaluateTimeVal(note_tbl.t)
