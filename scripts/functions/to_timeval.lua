@@ -39,7 +39,7 @@ local function EvaluateTimeVal(time_v)
         if not time_v then
             return nil
         end
-    elseif type(pitch_v) ~= "number" then
+    elseif type(time_v) ~= "number" then
         return nil
     end
     -- Will also pass if time_v was a number to begin with
@@ -56,6 +56,7 @@ local function EvaluatePitchVal(pitch_v)
     elseif type(pitch_v) ~= "number" then
         return nil
     end
+    -- Will also pass if pitch_v was a number to begin with
     return pitch_v
 end
 
@@ -77,6 +78,7 @@ local function ConvertVals(mainfn, song, beat_num, note_tbl, error_count)
     end
 
     if not time_v then
+        -- Similar case as above.
         InvalidTime(mainfn.title, time_v, pitch_v, beat_num)
         error_count = error_count + 1
         return 
