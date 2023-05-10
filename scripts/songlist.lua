@@ -42,6 +42,7 @@ directory["7-4 Examples"] = {
 }
 
 local songlist = {}
+
 for name, contents in pairs(directory) do
     for _, file in pairs(contents) do
         -- error proofing just so folks get less headaches
@@ -59,7 +60,7 @@ for name, contents in pairs(directory) do
     end
 end
 
-for i, path in pairs(songlist) do
+for i, path in ipairs(songlist) do
     local address = "songs/"..path 
     local invalid = address.." is missing a valid"
     local songfile = require(address) 

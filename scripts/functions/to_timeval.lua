@@ -82,7 +82,7 @@ local function ConvertVals(mainfn, song, beat_num, note_tbl, error_count)
         return 
     end
     
-    song[i][1] = pitch_v + mainfn.transpose
+    song[beat_num][1] = pitch_v + mainfn.transpose
     song[beat_num].t = mainfn.offset
     --[[ Update mainfn.offset AFTER we set the song[index].t value
     This is so we effectively get the offset of the PREVIOUS note.

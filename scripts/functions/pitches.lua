@@ -1,30 +1,46 @@
--- CREATION OF STRING PITCHES TO PITCH VALUES TABLE
+-- Creation of String-Value pairs Pitches table
 
 local letternames = {
-    -- PRIMARY NOTE NAMES       -- ENHARMONICS
-    ["C"]    =   1,             ["B#"]   =   1,
-    ["C#"]   =   2,             ["Db"]   =   2,
+    -- PRIMARY NOTE NAMES 
+    ["C"]    =   1,
     ["D"]    =   3,
-    ["D#"]   =   4,             ["Eb"]   =   4,
-    ["E"]    =   5,             ["Fb"]   =   5,
-    ["F"]    =   6,             ["E#"]   =   6,
-    ["F#"]   =   7,             ["Gb"]   =   7,
+    ["E"]    =   5,    
+    ["F"]    =   6,
     ["G"]    =   8,
-    ["G#"]   =   9,             ["Ab"]   =   9,
-    ["A"]    =   10, 
-    ["A#"]   =   11,            ["Bb"]   =   11,
-    ["B"]    =   12,            ["Cb"]   =   12,
+    ["A"]    =   10,
+    ["B"]    =   12,
 }
--- i'll allow E#/Fb and B#/Cb, but double flats and sharps are just... no.
 
-local function ToOctave()
-    local pitches = {}
-    for letter,pitchnum in pairs(letternames) do
-        for octave=1, 6 do
-            pitches[letter..octave] = pitchnum + (octave * 12)
-        end
+local function MakeAccidentals(rets, letter, octave, pitch_val)
+    local flats = ""
+    for num_flats = 1, 2 do
+        -- Single flat on 1st iter, Two flats on 2nd
+        flats = flats.."b"
+        rets[letter..flats..octave] = pitch_val - num_flats
     end
-    return pitches
+
+    local sharps = ""
+    for num_sharps = 1, 2 do
+        -- Single sharp on 1st iter, Two sharps on 2nd
+        sharps = sharps.."#"
+        rets[letter..sharps..octave] = pitch_val + num_sharps
+    end
 end
 
-return ToOctave()
+local function MakeNote(rets, letter, pitch_num)
+    for octave = 1, 6 do
+        local pitch_val = pitch_num + (pitch_num * 12)
+        rets[letter..pitch_num] = pitch_val
+        MakeAccidentals(rets, letter, octave, pitch_val)
+    end
+end
+
+local function MakeOctaves()
+    local rets = {}
+    for letter, pitch_num in pairs(letternames) do
+        MakeNote(rets, letter, pitch_num)
+    end
+    return rets
+end
+
+return MakeOctaves()
