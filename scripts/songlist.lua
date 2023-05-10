@@ -1,24 +1,23 @@
 local songlist = {}
-local directory = {} -- this is where you'll define your folders.
-local dir = directory -- use dir["My Folder's Path"] when declaring new subtables.
 
-dir["My Songs"] = 
-{
+-- This is where you'll define your folders.
+local directory = {}  T
+-- Use directory["My Folder's Path"] when declaring new subtables.
+
+directory["My Songs"] = {
     "template",
     "jazzlick",
 }
 
 -- EXAMPLE SONGS (from the "#-# Examples" folders)
 
-dir["3-4 Examples"] = 
-{ 
+directory["3-4 Examples"] = { 
     "malaguena", 
     "minuetg_bass",
     "minuetg_treble",
 }
 
-dir["4-4 Examples"] =
-{
+directory["4-4 Examples"] = {
     "blackbird_guitarchords",
     "blackbird_guitardrone",
     "blackbird_vox",
@@ -28,20 +27,17 @@ dir["4-4 Examples"] =
     "goodday_vox",
 }
 
-dir["5-4 Examples"] = 
-{
+directory["5-4 Examples"] = {
     "take5_comp",
     "take5_melody",
 }
 
-dir["6-8 Examples"] =
-{
+directory["6-8 Examples"] = {
     "hotrs_guitar", -- short for "House of the Rising Sun".
     "hotrs_vox",    -- you wouldn't want to type out all that would you?
 }
 
-dir["7-4 Examples"] = 
-{
+directory["7-4 Examples"] = {
     "whiplash_bass",
     "whiplash_comp",
     "whiplash_melody",
@@ -51,13 +47,14 @@ dir["7-4 Examples"] =
 
 for name, contents in pairs(directory) do
     for _, file in pairs(contents) do
-
-        file = string.gsub(file, ".lua", "") -- error proofing just so folks get less headaches
+        -- error proofing just so folks get less headaches
+        file = string.gsub(file, ".lua", "") 
 
         path = name.."/"..file
 
         if string.find(name, "/", -1) or string.find(name, "\\", -1) then   
-            path = name..file -- accomodate if user appended any kind of slash at end of folder path
+            -- accomodate if user appended a slash at end of folder path
+            path = name..file 
         end
 
         table.insert(songlist, path)

@@ -1,4 +1,3 @@
-local MOD_ENV = env
 _G = GLOBAL
 _G.setfenv(1, _G)
 
@@ -11,23 +10,24 @@ _G.setfenv(1, _G)
 end
 SetPackagePath("dst-009_ShellBells\\scripts\\?.lua") ]]
 
-local prettyname = "Shell Bell Music:"
-print(prettyname.." Begin compiling all songs!")
+local MOD_PRETTYNAME = "[Shell Bell Music]: "
+local stringf = string.format
+local function printf(fmt, ...)
+    print(MOD_PRETTYNAME.. stringf(fmt, ...))
+end
+
+printf("Begin compiling all songs!")
 
 mysongs = {}    -- Instead of a million individual global variables, index this new global table instead
----@type TimeVal function
-local TimeVal = MOD_ENV.require("functions/to_timeval")
----@type songlist table
-local songlist = MOD_ENV.require("songlist")
+local TimeVal = require("functions/to_timeval")
+local songlist = require("songlist")
 
----@param i integer
----@param data table
 for i, data in pairs(songlist) do
     _G.mysongs[data.title] = TimeVal(data.title, data.notes, data.transpose) 
     -- immediately create a key the global table mysongs for your newly converted song 
 end 
 
-print(prettyname.." Done compiling all songs.")
+printf("Done compiling all songs.")
 
 --[[
 FORMAT:
@@ -40,14 +40,12 @@ EXAMPLE:
 ]]
 
 if TheNet and not TheNet:GetIsServerAdmin() then
-    print(prettyname.." You do not have admin permissions on this server. Returning.")
+    printf("You do not have admin permissions on this server. Returning.")
     return
 end
 
 -- STARTPOS FUNCTIONS
 
----@param num integer
----@return table coords
 function PlayerPos(num) 
     local player = AllPlayers[num] or ThePlayer
     local coords = {}
@@ -55,10 +53,6 @@ function PlayerPos(num)
     return coords
 end
 
----@param x integer
----@param y integer
----@param z integer
----@return table|nil coords
 function Coords(x,y,z) -- quickly create a table of coordinates with x y z as the keys!
     local coords = {}
     y = y or 0
@@ -71,58 +65,88 @@ function Coords(x,y,z) -- quickly create a table of coordinates with x y z as th
 end
 
 -- Placement Fns
+
 DIRECTION_FN = 
 {
     N = function(pos, mult)
-        return Vector3(pos.x - 1 * mult, 0, pos.z + 1 * mult)
+        return Vector3(
+            pos.x - 1 * mult, 
+            0, 
+            pos.z + 1 * mult
+        )
     end,
 
     NE = function(pos, mult) 
-        return Vector3(pos.x, 0, pos.z - 1 * mult)
+        return Vector3(
+            pos.x, 
+            0, 
+            pos.z - 1 * mult
+        )
     end,
 
     W = function(pos, mult)
-        return Vector3(pos.x + 1 * mult, 0, pos.z + 1 * mult)
+        return Vector3(
+            pos.x + 1 * mult, 
+            0, 
+            pos.z + 1 * mult
+        )
     end,
 
     NW = function(pos, mult) 
-        return Vector3(pos.x - 1 * mult, 0, pos.z)
+        return Vector3(
+            pos.x - 1 * mult, 
+            0, 
+            pos.z
+        )
     end,
 
     E = function(pos, mult)
-        return Vector3(pos.x - 1 * mult, 0, pos.z - 1 * mult )
+        return Vector3(
+            pos.x - 1 * mult, 
+            0, 
+            pos.z - 1 * mult
+        )
     end,
 
     SW = function(pos, mult) 
-        return Vector3(pos.x, 0, pos.z + 1 * mult)
+        return Vector3(
+            pos.x, 
+            0, 
+            pos.z + 1 * mult
+        )
     end,
 
     S = function(pos, mult)
-        return Vector3(pos.x + 1 * mult, 0, pos.z - 1 * mult)
+        return Vector3(
+            pos.x + 1 * mult, 
+            0, 
+            pos.z - 1 * mult
+        )
     end,
 
     SE = function(pos, mult) 
-        return Vector3(pos.x + 1 * mult, 0, pos.z)
+        return Vector3(
+            pos.x + 1 * mult, 
+            0, 
+            pos.z
+        )
     end,
 
     -- Extra Keys, juuuust in case you want to use em
 
-    NORTH = N,
-    NORTHEAST = NE,
+    NORTH = DIRECTION_FN.N,
+    NORTHEAST = DIRECTION_FN.NE,
+    WEST = DIRECTION_FN.W,
+    NORTHWEST = DIRECTION_FN.NW,
 
-    WEST = W,
-    NORTHWEST = NW,
-
-    EAST = E,
-    SOUTHWEST = SW,
-
-    SOUTH = S,
-    SOUTHEAST = SE,
+    EAST = DIRECTION_FN.E,
+    SOUTHWEST = DIRECTION_FN.SW,
+    SOUTH = DIRECTION_FN.S,
+    SOUTHEAST = DIRECTION_FN.SE,
 }
 
 -- EASE OF USE FUNCTIONS 
 
----@return string shard
 local function GetShard()
     local shard = "this shard"
     if TheWorld:HasTag("forest") then
@@ -137,12 +161,8 @@ local function GetShard()
     return string.upper(shard)
 end
 
-local invalid = prettyname.." Radius input '%s'"
-local success = prettyname.." %s - We found '%d' shell bells"
----@param entity table
----@param count integer
----@param remove boolean|nil
----@return integer count
+local invalid = "Radius input '%s'"
+local success = "%s - We found '%d' shell bells"
 local function IndivShellCount(entity, count, remove)
     if remove then -- if remove == nil or remove == false, then ignore
         entity:Remove()
@@ -151,21 +171,16 @@ local function IndivShellCount(entity, count, remove)
 end
 
 local shell = "singingshell_octave"
----@param entity table
----@param count integer
----@param remove boolean|nil
----@return integer
 local function CheckIsShell(entity, count, remove)
-    if (entity.prefab == shell.."3") or (entity.prefab == shell.."4") or (entity.prefab == shell.."5") then
+    if (entity.prefab == shell.."3") or 
+    (entity.prefab == shell.."4") or 
+    (entity.prefab == shell.."5") then
         return IndivShellCount(entity, count, remove)
     end
     -- If not a shell, then just return the original count
     return count
 end
 
----@param ents table
----@param remove boolean|nil
----@return integer
 local function GetShellCount(ents, remove)
     local count = 0
     for _, v in pairs(ents) do
@@ -175,8 +190,6 @@ local function GetShellCount(ents, remove)
 end
 
 -- Returns 2 values: entities table and range number in radius units
----@param radius integer|nil
----@return table|nil, integer|nil
 local function GetEnts(radius)
     local range
     if radius == nil then
@@ -186,7 +199,7 @@ local function GetEnts(radius)
 
     if not (type(radius) == "number") then
         radius = tostring(radius)
-        print(string.format(invalid.." is not a number value!", radius))
+        printf(stringf(invalid.." is not a number value!", radius))
         -- Invalid radius input, so return both nil to return the error 
         return nil, nil
     end
@@ -194,15 +207,14 @@ local function GetEnts(radius)
     local x,y,z = ThePlayer.Transform:GetWorldPosition()
 
     local ents = TheSim:FindEntities(x,y,z, radius)
-    range = string.format("in a '%d' unit radius", radius)
-    -- Radius is valid, so get the entities in the given radius around the player
+    range = stringf("in a '%d' unit radius", radius)
+    -- Radius is valid, so get entities in the given radius around the player
     -- Return local entities table and range number
     return ents, range
 end
 
----@param radius integer|nil
----@param remove boolean|nil
 local function GetShells(radius, remove)
+    -- GetEnts returns 2 values: a table (ents) and a string (range)
     local ents, range = GetEnts(radius)
     if ents == nil then
         return 
@@ -213,24 +225,22 @@ local function GetShells(radius, remove)
 
     local msg = ""
     if range == nil then
-        msg = string.format(success..".", shard, count)
+        msg = stringf(success..".", shard, count)
     else
-        msg = string.format(success.." %s.", shard, count, range)
+        msg = stringf(success.." %s.", shard, count, range)
     end
 
     if remove then
         msg = string.gsub(msg, "found", "removed")
     end
 
-    print(msg)
+    printf(msg)
 end
 
----@param radius integer|nil
 function ShellsRemove(radius)     -- this command is very robust. be careful with how you use it!        
     GetShells(radius, true)     -- 2nd argument must be a boolean, see GetShells declaration above.
 end
 
----@param radius integer|nil
 function ShellsCount(radius)
     GetShells(radius)
 end
