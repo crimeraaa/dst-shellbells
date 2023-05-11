@@ -33,11 +33,11 @@ local function InvalidPitch(title, pitch_v, time_v, index)
     FailWarning(title, "pitch", pitch_v, "time", time_v, index)
 end
 
--- `ref_tbl` is either PITCHES or RHYTHMS from above
+-- `ref_tbl` is either PITCHES or RHYTHMS from above.
 local function EvaluateVal(val, ref_tbl)
     if type(val) == "string" then
         val = ref_tbl[val]
-        -- If pitches[val] returned nil, it was invalid
+        -- If ref_tbl[val] returned nil, it was invalid
         if not val then
             return nil
         end
@@ -48,7 +48,7 @@ local function EvaluateVal(val, ref_tbl)
     return val
 end
 
--- Modify mainfn.song table directly.
+-- Modify song table directly.
 local function ConvertVals(mainfn, song, beat_num, note_tbl, error_count)    
     -- note_tbl[1] and note_tbl.t *should* be constant keys, so don't loop
     local pitch_v = EvaluateVal(note_tbl[1], PITCHES)
@@ -61,9 +61,7 @@ local function ConvertVals(mainfn, song, beat_num, note_tbl, error_count)
         This is so we can document all possible errors. ]]
         error_count = error_count + 1
         return 
-    end
-
-    if not time_v then
+    elseif not time_v then
         -- Similar case as above.
         InvalidTime(mainfn.title, time_v, pitch_v, beat_num)
         error_count = error_count + 1
