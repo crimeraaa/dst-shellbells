@@ -66,83 +66,41 @@ end
 
 -- Placement Fns
 
+local function MakeDirectionFn(fn_x, fn_z)
+    fn_x = fn_x or 0
+    fn_z = fn_z or 0
+    local function ret_fn(pos, mult)
+        return Vector3(
+            pox.x + fn_x,
+            0,
+            pos.z + fn_z
+        )
+    end
+    return ret_fn
+end
+
 DIRECTION_FN = 
 {
-    N = function(pos, mult)
-        return Vector3(
-            pos.x - 1 * mult, 
-            0, 
-            pos.z + 1 * mult
-        )
-    end,
+    N = MakeDirectionFn(-mult, mult),
+    NE = MakeDirectionFn(nil, -mult),
+    E = MakeDirectionFn(-mult, -mult),
+    SE = MakeDirectionFn(mult, nil),
 
-    NE = function(pos, mult) 
-        return Vector3(
-            pos.x, 
-            0, 
-            pos.z - 1 * mult
-        )
-    end,
-
-    W = function(pos, mult)
-        return Vector3(
-            pos.x + 1 * mult, 
-            0, 
-            pos.z + 1 * mult
-        )
-    end,
-
-    NW = function(pos, mult) 
-        return Vector3(
-            pos.x - 1 * mult, 
-            0, 
-            pos.z
-        )
-    end,
-
-    E = function(pos, mult)
-        return Vector3(
-            pos.x - 1 * mult, 
-            0, 
-            pos.z - 1 * mult
-        )
-    end,
-
-    SW = function(pos, mult) 
-        return Vector3(
-            pos.x, 
-            0, 
-            pos.z + 1 * mult
-        )
-    end,
-
-    S = function(pos, mult)
-        return Vector3(
-            pos.x + 1 * mult, 
-            0, 
-            pos.z - 1 * mult
-        )
-    end,
-
-    SE = function(pos, mult) 
-        return Vector3(
-            pos.x + 1 * mult, 
-            0, 
-            pos.z
-        )
-    end,
+    S = MakeDirectionFn(mult, -mult),
+    SW = MakeDirectionFn(nil, mult),
+    W = MakeDirectionFn(mult, mult),
+    NW = MakeDirectionFn(-mult, nil),
 
     -- Extra Keys, juuuust in case you want to use em
-
     NORTH = DIRECTION_FN.N,
     NORTHEAST = DIRECTION_FN.NE,
+    EAST = DIRECTION_FN.E,
+    SOUTHEAST = DIRECTION_FN.SE,
+
+    SOUTH = DIRECTION_FN.S,
+    SOUTHWEST = DIRECTION_FN.SW,
     WEST = DIRECTION_FN.W,
     NORTHWEST = DIRECTION_FN.NW,
-
-    EAST = DIRECTION_FN.E,
-    SOUTHWEST = DIRECTION_FN.SW,
-    SOUTH = DIRECTION_FN.S,
-    SOUTHEAST = DIRECTION_FN.SE,
 }
 
 -- EASE OF USE FUNCTIONS 
@@ -172,9 +130,9 @@ end
 
 local shell = "singingshell_octave"
 local function CheckIsShell(entity, count, remove)
-    if (entity.prefab == shell.."3") or 
-    (entity.prefab == shell.."4") or 
-    (entity.prefab == shell.."5") then
+    if entity.prefab == shell.."3" 
+    or entity.prefab == shell.."4" 
+    or entity.prefab == shell.."5" then
         return IndivShellCount(entity, count, remove)
     end
     -- If not a shell, then just return the original count
@@ -197,7 +155,7 @@ local function GetEnts(radius)
         return Ents, nil
     end
 
-    if not (type(radius) == "number") then
+    if type(radius) ~= "number" then
         radius = tostring(radius)
         printf(stringf(invalid.." is not a number value!", radius))
         -- Invalid radius input, so return both nil to return the error 
