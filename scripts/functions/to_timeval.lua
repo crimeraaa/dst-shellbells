@@ -33,39 +33,26 @@ local function InvalidPitch(title, pitch_v, time_v, index)
     FailWarning(title, "pitch", pitch_v, "time", time_v, index)
 end
 
-local function EvaluateTimeVal(time_v)
-    if type(time_v) == "string" then
-        time_v = RHYTHMS[time_v]
-        -- Same with EvaluatePitchVal, return nil if invalid
-        if not time_v then
+-- `ref_tbl` is either PITCHES or RHYTHMS from above
+local function EvaluateVal(val, ref_tbl)
+    if type(val) == "string" then
+        val = ref_tbl[val]
+        -- If pitches[val] returned nil, it was invalid
+        if not val then
             return nil
         end
-    elseif type(time_v) ~= "number" then
+    elseif type(val) ~= "number" then
         return nil
     end
-    -- Will also pass if time_v was a number to begin with
-    return time_v
-end
-
-local function EvaluatePitchVal(pitch_v)
-    if type(pitch_v) == "string" then
-        pitch_v = PITCHES[pitch_v]
-        -- If pitches[pitch_v] returned nil, it was invalid
-        if not pitch_v then
-            return nil
-        end
-    elseif type(pitch_v) ~= "number" then
-        return nil
-    end
-    -- Will also pass if pitch_v was a number to begin with
-    return pitch_v
+    -- Will also pass if val was a number to begin with
+    return val
 end
 
 -- Modify mainfn.song table directly.
 local function ConvertVals(mainfn, song, beat_num, note_tbl, error_count)    
     -- note_tbl[1] and note_tbl.t *should* be constant keys, so don't loop
-    local pitch_v = EvaluatePitchVal(note_tbl[1])
-    local time_v = EvaluateTimeVal(note_tbl.t)
+    local pitch_v = EvaluateVal(note_tbl[1], PITCHES)
+    local time_v = EvaluateVal(note_tbl.t, RHYTHMS)
 
     if not pitch_v then
         InvalidPitch(mainfn.title, pitch_v, time_v, beat_num)
