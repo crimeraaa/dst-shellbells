@@ -75,8 +75,7 @@ local function ConvertVals(mainfn, beat_num, note_tbl, error_count)
     
     if out_pitch == 0 then
         mainfn.offset = mainfn.offset + out_time
-        --[[ Update offset only and ignore the note_tbl. 
-        TODO: Erase or ignore this note table without messing up the rest. ]]
+        -- Update offset only and ignore the note_tbl.
         return 
     end
     
@@ -96,7 +95,6 @@ function TimeVal(title, song, transpose)
         -- Constant Values
         title = title,
         transpose = transpose or 0,
-        -- Final table we'll return
         notes = {},
         -- offset starts at 0 game distance units, modify it as we go.
         offset = 0,
