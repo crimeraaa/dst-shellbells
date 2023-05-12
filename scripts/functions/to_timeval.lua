@@ -25,12 +25,12 @@ local function FailWarning(title, typeof1, val1, typeof2, val2, index)
     printf(ERROR_MSG, title, typeof1, val1, typeof2, val2, index)
 end
 
-local function InvalidTime(title, time_v, pitch_v, index)
-    FailWarning(title, "time", time_v, "pitch", pitch_v, index)
+local function InvalidTime(title, out_time, out_pitch, index)
+    FailWarning(title, "time", out_time, "pitch", out_pitch, index)
 end
 
-local function InvalidPitch(title, pitch_v, time_v, index)
-    FailWarning(title, "pitch", pitch_v, "time", time_v, index)
+local function InvalidPitch(title, out_pitch, out_time, index)
+    FailWarning(title, "pitch", out_pitch, "time", out_time, index)
 end
 
 -- `ref_tbl` is either PITCHES or RHYTHMS from above.
@@ -49,31 +49,45 @@ local function EvaluateVal(val, ref_tbl)
 end
 
 -- Modify song table directly.
-local function ConvertVals(mainfn, song, beat_num, note_tbl, error_count)    
+local function ConvertVals(mainfn, beat_num, note_tbl, error_count)    
     -- note_tbl[1] and note_tbl.t *should* be constant keys, so don't loop
-    local pitch_v = EvaluateVal(note_tbl[1], PITCHES)
-    local time_v = EvaluateVal(note_tbl.t, RHYTHMS)
 
-    if not pitch_v then
-        InvalidPitch(mainfn.title, pitch_v, time_v, beat_num)
+    -- `in` stands for `input`
+    local in_pitch = note_tbl[1]
+    local in_time = note_tbl.t
+
+    -- `out` stands for `output`
+    local out_pitch = EvaluateVal(in_pitch, PITCHES)
+    local out_time = EvaluateVal(in_time, RHYTHMS)
+
+    if not out_pitch then
         --[[ Force return so we don't mess up anything else,
         But keep going for the rest of the songfile.
         This is so we can document all possible errors. ]]
         error_count = error_count + 1
+        InvalidPitch(mainfn.title, in_pitch, in_time, beat_num)
         return 
-    elseif not time_v then
-        -- Similar case as above.
-        InvalidTime(mainfn.title, time_v, pitch_v, beat_num)
+    elseif not out_time then
+        InvalidTime(mainfn.title, in_time, in_pitch, beat_num)
         error_count = error_count + 1
         return 
     end
     
-    song[beat_num][1] = pitch_v + mainfn.transpose
-    song[beat_num].t = mainfn.offset
+    if out_pitch == 0 then
+        mainfn.offset = mainfn.offset + out_time
+        --[[ Update offset only and ignore the note_tbl. 
+        TODO: Erase or ignore this note table without messing up the rest. ]]
+        return 
+    end
+    
+    local new_pitch = out_pitch + mainfn.transpose
+    local new_time = mainfn.offset
+    table.insert(mainfn.notes, { [1] = new_pitch, ["t"] = new_time })
+
     --[[ Update mainfn.offset AFTER we set the song[index].t value
     This is so we effectively get the offset of the PREVIOUS note.
     THEN we update the offset. This is weird, but it works. ]]
-    mainfn.offset = mainfn.offset + time_v
+    mainfn.offset = mainfn.offset + out_time
 end
 
 local got_error = "Warning! We got %d errors while compiling song file '%s'."
@@ -82,13 +96,15 @@ function TimeVal(title, song, transpose)
         -- Constant Values
         title = title,
         transpose = transpose or 0,
+        -- Final table we'll return
+        notes = {},
         -- offset starts at 0 game distance units, modify it as we go.
         offset = 0,
     }
 
     local error_count = 0
     for i, note_tbl in ipairs(song) do
-        ConvertVals(mainfn, song, i, note_tbl, error_count)
+        ConvertVals(mainfn, i, note_tbl, error_count)
     end
 
     if error_count > 0 then
@@ -97,7 +113,7 @@ function TimeVal(title, song, transpose)
         return nil
     end
 
-    return song
+    return mainfn.notes
 end
 
 return TimeVal
