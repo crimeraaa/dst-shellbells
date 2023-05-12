@@ -1,5 +1,5 @@
 local is_local = true
-local append = (is_local and " (Local") or ""
+local append = (is_local and " (Local)") or ""
 
 name = "Shell Bell Music"..append
 author = "crimeraaa"

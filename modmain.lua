@@ -18,31 +18,33 @@ end
 
 printf("Begin compiling all songs!")
 
-mysongs = {}    -- Instead of a million individual global variables, index this new global table instead
+-- Index this new global tables to access your songs
+MYSONGS = {} 
 local TimeVal = require("functions/to_timeval")
 local songlist = require("songlist")
 
 for i, data in pairs(songlist) do
-    _G.mysongs[data.title] = TimeVal(data.title, data.notes, data.transpose) 
-    -- immediately create a key the global table mysongs for your newly converted song 
+    MYSONGS[data.title] = TimeVal(data.title, data.notes, data.transpose) 
+    --[[ immediately create a key the global table MYSONGS 
+    index your newly converted song from there ]]
 end 
 
 printf("Done compiling all songs.")
 
 --[[
 FORMAT:
-    c_shellsfromtable(mysongs.yoursongname, startpos, placementfn, spacing_mult)
+    c_shellsfromtable(MYSONGS.songname, startpos, placementfn, spacing_mult)
 EXAMPLE:
     local here = Coords(90, 0, -300)
     local dir = DIRECTION_FN.NW
     local mult = 5
-    c_shellsfromtable(mysongs.whiplash_melody, here, dir, mult)
+    c_shellsfromtable(MYSONGS.whiplash_melody, here, dir, mult)
 ]]
 
-if TheNet and not TheNet:GetIsServerAdmin() then
+--[[ if TheNet and not TheNet:GetIsServerAdmin() then
     printf("You do not have admin permissions on this server. Returning.")
     return
-end
+end ]]
 
 -- STARTPOS FUNCTIONS
 
@@ -53,54 +55,56 @@ function PlayerPos(num)
     return coords
 end
 
-function Coords(x,y,z) -- quickly create a table of coordinates with x y z as the keys!
+-- Quickly create a table of coordinates with x y z as the keys!
+function Coords(x,y,z) 
     local coords = {}
     y = y or 0
     if (x == nil or z == nil) then 
         return nil 
     else
-        coords.x, coords.y, coords.z = x,y,z 
+        coords.x, coords.y, coords.z = x, y, z 
         return coords
     end
 end
 
 -- Placement Fns
 
-local function MakeDirectionFn(fn_x, fn_z)
-    fn_x = fn_x or 0
-    fn_z = fn_z or 0
-    local function ret_fn(pos, mult)
+local function MakeDirFn(x_mult, z_mult)
+    local ret_fn = function(pos, mult)
         return Vector3(
-            pox.x + fn_x,
+            pos.x + (mult * (x_mult or 0)), 
             0,
-            pos.z + fn_z
+            pos.z + (mult * (z_mult or 0))
         )
     end
     return ret_fn
 end
 
+local mult = 1
+
+local N = MakeDirFn(-mult, mult)
+local NE = MakeDirFn(nil, -mult)
+local E = MakeDirFn(-mult, -mult)
+local SE = MakeDirFn(mult, nil)
+
+local S = MakeDirFn(mult, -mult)
+local SW = MakeDirFn(nil, mult)
+local W = MakeDirFn(mult, mult)
+local NW = MakeDirFn(-mult, nil)
+
 DIRECTION_FN = 
 {
-    N = MakeDirectionFn(-mult, mult),
-    NE = MakeDirectionFn(nil, -mult),
-    E = MakeDirectionFn(-mult, -mult),
-    SE = MakeDirectionFn(mult, nil),
-
-    S = MakeDirectionFn(mult, -mult),
-    SW = MakeDirectionFn(nil, mult),
-    W = MakeDirectionFn(mult, mult),
-    NW = MakeDirectionFn(-mult, nil),
+    N = N,          NE = NE, 
+    E = E,          SE = SE,
+    S = S,          SW = SW, 
+    W = W,          NW = NW,
 
     -- Extra Keys, juuuust in case you want to use em
-    NORTH = DIRECTION_FN.N,
-    NORTHEAST = DIRECTION_FN.NE,
-    EAST = DIRECTION_FN.E,
-    SOUTHEAST = DIRECTION_FN.SE,
 
-    SOUTH = DIRECTION_FN.S,
-    SOUTHWEST = DIRECTION_FN.SW,
-    WEST = DIRECTION_FN.W,
-    NORTHWEST = DIRECTION_FN.NW,
+    NORTH = N,      NORTHEAST = NE, 
+    EAST = E,       SOUTHEAST = SE, 
+    SOUTH = S,      SOUTHWEST = SW, 
+    WEST = W,       NORTHWEST = NW,
 }
 
 -- EASE OF USE FUNCTIONS 
