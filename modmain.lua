@@ -131,7 +131,6 @@ end
 
 -- Given integer `radius`, returns 2 values: `ents` table and `range` string
 local invalid = "Radius input '%s'"
-local success = "%s - We found '%d' shell bells"
 local function GetEnts(radius)
     local range
     if radius == nil then
@@ -155,6 +154,7 @@ local function GetEnts(radius)
     return ents, range
 end
 
+local success = "%s - We found '%d' shell bells"
 local function GetShells(radius, remove)
     local ents, range = GetEnts(radius)
     if ents == nil then
