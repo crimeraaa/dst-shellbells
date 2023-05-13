@@ -6,8 +6,10 @@ data.transpose = -4
 --[[ "Malaguena Facil" by Francisco Tarrega (Disputed)
 3/4 Time
 Key of E major ]]
+
 local INTRO = {}
 INTRO.MAIN = {
+    
 -- 1ST MEASURE - Emaj
     --[[1]]     { "E3",     t = "1/8" }, 
     --[[&]]     { "G#4",    t = 0     },    { "B4",  t = 0 },   { "E5", t = "1/8" }, 

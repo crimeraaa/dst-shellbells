@@ -3,9 +3,9 @@ local data = {}
 data.title = "minuetg_bass"
 data.transpose = 0 
 
--- "Minuet in G" by Christian Petzold (formerly attributed to Johann Sebastian Bach)
--- Key of G major, 3/4 time.
--- Lower Voice.
+--[[ "Minuet in G" by Christian Petzold (formerly attributed to Johann Sebastian Bach)
+Key of G major, 3/4 time.
+Lower Voice. ]]
 
 local FIRST_HALF = {
 -- 1ST MEASURE
