@@ -182,6 +182,6 @@ data.notes = SectionsHelper.MakeSections(
     ENDING
 )
 
--- SectionsHelper.CheckSections(data.notes)
+-- SectionsHelper.CheckSections(data)
 
 return data

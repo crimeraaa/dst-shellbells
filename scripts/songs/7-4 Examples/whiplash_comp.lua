@@ -1,14 +1,14 @@
+local SectionsHelper = require("functions/sections_fns")
 local data = {}
 data.title = "whiplash_comp"
 data.transpose = 0
-data.notes = 
-{
--- "Whiplash" by Hank Levy/Don Ellis (1973).
--- Key of C minor, but like many blues and jazz tunes it uses at lot of chromaticism and non diatonic tones.
--- 7/4 time, Band part (Horns and Strings sections mainly)
 
--- INTRO
+--[[ "Whiplash" by Hank Levy/Don Ellis (1973).
+Key of C minor, but like many blues and jazz tunes it uses at lot of chromaticism and non diatonic tones.
+7/4 time, Band part (Horns and Strings sections mainly) ]]
 
+local INTRO = {}
+INTRO.BAND = {
 -- 1ST MEASURE
     --[[1]] { "G4", t = 0 },    { "A4", t = 0 },    { "D5", t = 0 },    { "G5", t = "1/4" },    -- A quartal/G
     --[[&]] 
@@ -123,10 +123,10 @@ data.notes =
 
     --[[7]] { "Bb4",t = 0 },    { "Db4",t = 0 },    { "Gb5",t = 0 },    { "Bb5",t = "1/4" },    -- Gb/Bb
     --[[&]] 
+}
 
--- BASS ONLY
--- 2 + 2 + 2 + 2 + 3 + 3 feel
-
+-- Kind of a lie, but I prefer to call this the "Bass only section"
+INTRO.BASS_ONLY = {
 -- 9TH MEASURE
     --[[1]] { "E4", t = 0 },    { "Bb4",t = 0 },    { "D#5",t = 0 },    { "G5", t = "7/4" },    -- C7(#9) (no root)
 
@@ -184,9 +184,10 @@ data.notes =
 
     --[[1]] { "Bb3",t = 0 },    { "D4", t = 0 },    { "F4", t = "6/8" },    -- Bb
     --[[2]] 
+}
 
--- A SECTION MELODY
-
+local A_SECTION = {}
+A_SECTION.MAIN = {
 -- 17TH MEASURE
     --[[1]] { "G3", t = 0 },    { "C4", t = 0 },    { "E4", t = "7/4" },    -- C/G
 
@@ -210,10 +211,10 @@ data.notes =
 
 -- 24TH MEASURE
     --[[1]] { 0, t = "7/4" }, 
+}
 
--- B SECTION
-
--- 25TH MEASURE
+local B_SECTION = {
+    -- 25TH MEASURE
     --[[1]] { "G3", t = 0 },    { "Bb3", t = 0 },   { "F4", t = "1/4" },    -- Bb
     --[[2]] { "G3", t = 0 },    { "Bb3", t = 0 },   { "F4", t = "6/4" }, 
 
@@ -326,10 +327,9 @@ data.notes =
     --[[&]] 
 
     --[[1]] { "D4", t = 0 },    { "D4", t = 0 },    { "G4", t = 0 },    { "D5", t = "6/8" }, 
+}
 
--- REPEAT A SECTION
--- HORNS VARIATION
-
+A_SECTION.VARIATION = {
 -- 17TH MEASURE
     --[[1]] { 0, t = "2/4" },  
     --[[2]] 
@@ -401,126 +401,16 @@ data.notes =
 
     --[[1]] 
     --[[2]]  
+}
 
--- REPEAT INTRO
-
--- 1ST MEASURE
-    --[[1]] { "G4", t = 0 },    { "A4", t = 0 },    { "D5", t = 0 },    { "G5", t = "1/4" },    -- A quartal/G
-    --[[&]] 
-
-    --[[2]] { "G4", t = 0 },    { "A4", t = 0 },    { "D5", t = 0 },    { "G5", t = "1/8" }, 
-    --[[&]] { "G4", t = 0 },    { "A4", t = 0 },    { "D5", t = 0 },    { "G5", t = "1/8" }, 
-
-    --[[3]] { "G4", t = 0 },    { "A4", t = 0 },    { "D5", t = 0 },    { "G5", t = "1/4" }, 
-    --[[&]] 
-
-    --[[4]] { "G4", t = 0 },    { "A4", t = 0 },    { "D5", t = 0 },    { "G5", t = "1/8" }, 
-    --[[&]] { "Bb4",t = 0 },    { "C5", t = 0 },    { "Eb5",t = 0 },    { "Bb5",t = "1/8" },    -- Cm7/Bb (ish?)
-
-    --[[5]] { 0, t = "1/8"}, 
-    --[[&]] { "G4", t = 0 },    { "A4", t = 0 },    { "D5", t = 0 },    { "G5", t = "1/8" },    -- A quartal/G
-
-    --[[6]] { "G4", t = 0 },    { "A4", t = 0 },    { "D5", t = 0 },    { "G5", t = "1/8" }, 
-    --[[&]] { "F4", t = 0 },    { "G4", t = 0 },    { "C5", t = 0 },    { "F5", t = "1/8" },    -- G quartal/F
-
-    --[[7]] { "G4", t = 0 },    { "A4", t = 0 },    { "D5", t = 0 },    { "G5", t = "1/4" }, 
-    --[[&]] 
-
--- 2ND MEASURE
-    --[[1]] { 0, t = "7/4"},    -- Bassline
-
--- 3RD MEASURE
-    --[[1]] { "G4", t = 0 },    { "A4", t = 0 },    { "D5", t = 0 },    { "G5", t = "1/4" },    -- A quartal/G
-    --[[&]] 
-
-    --[[2]] { "G4", t = 0 },    { "A4", t = 0 },    { "D5", t = 0 },    { "G5", t = "1/8" }, 
-    --[[&]] { "G4", t = 0 },    { "A4", t = 0 },    { "D5", t = 0 },    { "G5", t = "1/8" }, 
-
-    --[[3]] { "G4", t = 0 },    { "A4", t = 0 },    { "D5", t = 0 },    { "G5", t = "1/4" }, 
-    --[[&]] 
-
-    --[[4]] { "G4", t = 0 },    { "A4", t = 0 },    { "D5", t = 0 },    { "G5", t = "1/8" }, 
-    --[[&]] { "F4", t = 0 },    { "G4", t = 0 },    { "Bb5",t = 0 },    { "F5", t = "1/8" },    -- Gm7/F (ish?)
-
-    --[[5]] { 0, t = "1/8"}, 
-    --[[&]] { "F4", t = 0 },    { "G4", t = 0 },    { "Bb5",t = 0 },    { "F5", t = "1/8" }, 
-
-    --[[6]] { "G4", t = 0 },    { "A4", t = 0 },    { "D5", t = 0 },    { "G5", t = "2/4" },    -- A quartal/G
-
-    --[[7]] 
-
--- 4TH MEASURE
-    --[[1]] { 0, t = "7/4"},    -- Bassline
-
--- 5TH MEASURE
-    --[[1]] { "G4", t = 0 },    { "A4", t = 0 },    { "D5", t = 0 },    { "G5", t = "1/4" },    -- A quartal/G
-    --[[&]] 
-
-    --[[2]] { "G4", t = 0 },    { "A4", t = 0 },    { "D5", t = 0 },    { "G5", t = "1/8" }, 
-    --[[&]] { "G4", t = 0 },    { "A4", t = 0 },    { "D5", t = 0 },    { "G5", t = "1/8" }, 
-
-    --[[3]] { "G4", t = 0 },    { "A4", t = 0 },    { "D5", t = 0 },    { "G5", t = "1/4" }, 
-    --[[&]] 
-
-    --[[4]] { "G4", t = 0 },    { "A4", t = 0 },    { "D5", t = 0 },    { "G5", t = "1/8" }, 
-    --[[&]] { "Bb4",t = 0 },    { "C5", t = 0 },    { "Eb5",t = 0 },    { "Bb5",t = "1/8" },    -- Cm7/Bb (ish?)
-
-    --[[5]] { 0, t = "1/8"}, 
-    --[[&]] { "G4", t = 0 },    { "A4", t = 0 },    { "D5", t = 0 },    { "G5", t = "1/8" },    -- A quartal/G
-
-    --[[6]] { "G4", t = 0 },    { "A4", t = 0 },    { "D5", t = 0 },    { "G5", t = "1/8" }, 
-    --[[&]] { "F4", t = 0 },    { "G4", t = 0 },    { "C5", t = 0 },    { "F5", t = "1/8" },    -- G quartal/F
-
-    --[[7]] { "G4", t = 0 },    { "A4", t = 0 },    { "D5", t = 0 },    { "G5", t = "1/4" }, 
-    --[[&]] 
-
--- 6TH MEASURE
-    --[[1]] { 0, t = "7/4"},    -- Bassline
-
--- 7TH MEASURE
-    --[[1]] { "G4", t = 0 },    { "A4", t = 0 },    { "D5", t = 0 },    { "G5", t = "1/4" },    -- A quartal/G
-    --[[&]] 
-
-    --[[2]] { "G4", t = 0 },    { "A4", t = 0 },    { "D5", t = 0 },    { "G5", t = "1/8" }, 
-    --[[&]] { "G4", t = 0 },    { "A4", t = 0 },    { "D5", t = 0 },    { "G5", t = "1/8" }, 
-
-    --[[3]] { "G4", t = 0 },    { "A4", t = 0 },    { "D5", t = 0 },    { "G5", t = "1/4" }, 
-    --[[&]] 
-
-    --[[4]] { "G4", t = 0 },    { "A4", t = 0 },    { "D5", t = 0 },    { "G5", t = "1/8" }, 
-    --[[&]] { "F4", t = 0 },    { "G4", t = 0 },    { "Bb5",t = 0 },    { "F5", t = "1/8" },    -- Gm7/F (ish?)
-
-    --[[5]] { 0, t = "1/8"}, 
-    --[[&]] { "F4", t = 0 },    { "G4", t = 0 },    { "Bb5",t = 0 },    { "F5", t = "1/8" }, 
-
-    --[[6]] { "G4", t = 0 },    { "A4", t = 0 },    { "D5", t = 0 },    { "G5", t = "2/4" },    -- A quartal/G
-
-    --[[7]] 
-
--- 8TH MEASURE
-    --[[1]] { 0, t = "2/4" },   -- Bassline
-    --[[&]] 
-
-    --[[2]] 
-    --[[&]] 
-
-    --[[3]] { "F4", t = 0 },    { "G4", t = 0 },    { "C5", t = 0 },    { "F5", t = "1/8" },    -- G quartal/F
-    --[[&]] { "G4", t = 0 },    { "A4", t = 0 },    { "D5", t = 0 },    { "G5", t = "1/8" },    -- A quartal/G
-
-    --[[4]] { "G4", t = 0 },    { "A4", t = 0 },    { "D5", t = 0 },    { "G5", t = "1/8" }, 
-    --[[&]] { "F4", t = 0 },    { "G4", t = 0 },    { "C5", t = 0 },    { "F5", t = "1/8" },    -- G quartal/F
-    
-    --[[5]] { "G4", t = 0 },    { "A4", t = 0 },    { "D5", t = 0 },    { "G5", t = "1/8" },    -- A quartal/G
-    --[[&]] { "Bb4",t = 0 },    { "Db4",t = 0 },    { "Gb5",t = 0 },    { "Bb5",t = "1/8" },    -- Gb/Bb
-
-    --[[6]] { 0, t = "1/8"}, 
-    --[[&]] { "G4", t = 0 },    { "Bb4",t = 0 },    { "Eb5",t = 0 },    { "G5", t = "1/8" },    -- Ebm
-
-    --[[7]] { "Bb4",t = 0 },    { "Db4",t = 0 },    { "Gb5",t = 0 },    { "Bb5",t = "1/4" },    -- Gb/Bb
-    --[[&]] 
-
--- END
+local END_CHORD = {
     --[[1]] { "E4", t = 0 },    { "Bb4",t = 0 },    { "D#5",t = 0 },    { "G5", t = "7/4" },    -- C7(#9) (no root)
 }
+
+data.notes = SectionsHelper.MakeSections(
+    INTRO.BAND, INTRO.BASS_ONLY, 
+    A_SECTION.MAIN, B_SECTION, A_SECTION.VARIATION, 
+    INTRO.BAND, END_CHORD
+)
 
 return data
