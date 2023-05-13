@@ -2,13 +2,18 @@
 local PITCHES = require("functions/pitches")
 local RHYTHMS = require("functions/rhythms")
 
-local MOD_ERROR = "[Shell Bell Music]: "
+local MOD_PRETTYNAME = "[Shell Bell Music]: %s"
 local ERROR_MSG = "For song file '%s', we failed to convert %s \"%s\"!"..
 "\nIt has %s \"%s\" located at data.notes index %d."
 
+local stringf = string.format
 local function printf(fmt, ...)
-    print(MOD_ERROR.. string.format(fmt, ...))
+    local msg = stringf(fmt, ...)
+    print(stringf(MOD_PRETTYNAME, msg))
 end
+
+-- Just declaring here to prevent constant global lookups
+local assert = _G.assert
 
 local function FailWarning(title, typeof1, val1, typeof2, val2, index)
     if type(val1) ~= "string" then
@@ -60,10 +65,8 @@ local function ConvertVals(mainfn, beat_num, note_tbl, error_count)
     local out_pitch = EvaluateVal(in_pitch, PITCHES)
     local out_time = EvaluateVal(in_time, RHYTHMS)
 
+    -- Return, don't crash, so we can document all possible errors
     if not out_pitch then
-        --[[ Force return so we don't mess up anything else,
-        But keep going for the rest of the songfile.
-        This is so we can document all possible errors. ]]
         error_count = error_count + 1
         InvalidPitch(mainfn.title, in_pitch, in_time, beat_num)
         return 
@@ -89,7 +92,9 @@ local function ConvertVals(mainfn, beat_num, note_tbl, error_count)
     mainfn.offset = mainfn.offset + out_time
 end
 
-local got_error = "Warning! We got %d errors while compiling song file '%s'."
+local got_error = "We got %d errors while compiling song file '%s'."..
+" Please see your 'client_log.txt' file for more information."
+
 function TimeVal(title, song, transpose)
     local mainfn = {
         -- Constant Values
@@ -105,13 +110,21 @@ function TimeVal(title, song, transpose)
         ConvertVals(mainfn, i, note_tbl, error_count)
     end
 
-    if error_count > 0 then
-        -- Don't insert an invalid song table
-        printf(got_error, error_count, title)
-        return nil
-    end
+    -- Only here we'll force a crash, this is so we can list all errors
+    assert(error_count == 0, stringf(got_error, error_count, title))
 
     return mainfn.notes
 end
 
 return TimeVal
+
+--[[ Note to my dumb self:
+assuming 'origin' is set to the github repo,
+'experimental' is the name of the dev branch
+'main' is the name of this local working branch (i should clear that up)
+
+git push origin main:experimental
+
+If above doesn't work, clear any conflicts
+
+git pull origin experimental ]]

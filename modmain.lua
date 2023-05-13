@@ -2,21 +2,16 @@ _G = GLOBAL
 _G.setfenv(1, _G)
 
 -- For quicker compiler testing only
---[[ local function SetPackagePath(path)
-    local steamapps = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\"
-    local dst_mods = steamapps.."Don't Starve Together\\mods\\"
-    package.path = dst_mods..path
-    return dst_mods..path
-end
-SetPackagePath("dst-009_ShellBells\\scripts\\?.lua") ]]
+--[[ local steamapps = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\"
+local dst_mods = steamapps.."Don't Starve Together\\mods\\"
+package.path = dst_mods.."dst-015_ShellBellsRework\\scripts\\?.lua" ]]
 
-local MOD_PRETTYNAME = "[Shell Bell Music]: "
+local MOD_PRETTYNAME = "[Shell Bell Music]: %s"
 local stringf = string.format
 local function printf(fmt, ...)
-    print(MOD_PRETTYNAME.. stringf(fmt, ...))
+    local msg = stringf(fmt, ...)
+    print(stringf(MOD_PRETTYNAME, msg))
 end
-
-printf("Begin compiling all songs!")
 
 -- Index this new global tables to access your songs
 MYSONGS = {} 
@@ -28,8 +23,6 @@ for i, data in pairs(songlist) do
     --[[ immediately create a key the global table MYSONGS 
     index your newly converted song from there ]]
 end 
-
-printf("Done compiling all songs.")
 
 --[[
 FORMAT:
@@ -151,7 +144,7 @@ local function GetShellCount(ents, remove)
     return count
 end
 
--- Returns 2 values: entities table and range number in radius units
+-- Given integer `radius`, returns 2 values: `ents` table and `range` string
 local function GetEnts(radius)
     local range
     if radius == nil then
@@ -161,7 +154,7 @@ local function GetEnts(radius)
 
     if type(radius) ~= "number" then
         radius = tostring(radius)
-        printf(stringf(invalid.." is not a number value!", radius))
+        printf(invalid.." is not a number value!", radius)
         -- Invalid radius input, so return both nil to return the error 
         return nil, nil
     end
@@ -176,7 +169,6 @@ local function GetEnts(radius)
 end
 
 local function GetShells(radius, remove)
-    -- GetEnts returns 2 values: a table (ents) and a string (range)
     local ents, range = GetEnts(radius)
     if ents == nil then
         return 

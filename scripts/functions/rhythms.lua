@@ -2,7 +2,6 @@
 
 local rhythms = {
 
-
 	--[[ 0 TIME VALUE/CHORD ]]
 
 	["0"] = 0,
