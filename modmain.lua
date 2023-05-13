@@ -116,35 +116,22 @@ local function GetShard()
     return string.upper(shard)
 end
 
-local invalid = "Radius input '%s'"
-local success = "%s - We found '%d' shell bells"
-local function IndivShellCount(entity, count, remove)
-    if remove then -- if remove == nil or remove == false, then ignore
-        entity:Remove()
-    end
-    return count + 1
-end
-
 local shell = "singingshell_octave"
-local function CheckIsShell(entity, count, remove)
-    if entity.prefab == shell.."3" 
-    or entity.prefab == shell.."4" 
-    or entity.prefab == shell.."5" then
-        return IndivShellCount(entity, count, remove)
-    end
-    -- If not a shell, then just return the original count
-    return count
-end
-
 local function GetShellCount(ents, remove)
     local count = 0
-    for _, v in pairs(ents) do
-        count = CheckIsShell(v, count, remove)
+    for _, entity in pairs(ents) do
+        if entity.prefab == shell.."3" or entity.prefab == shell.."4" 
+        or entity.prefab == shell.."5" then
+            if remove then entity:Remove() end
+            count = count + 1
+        end
     end
     return count
 end
 
 -- Given integer `radius`, returns 2 values: `ents` table and `range` string
+local invalid = "Radius input '%s'"
+local success = "%s - We found '%d' shell bells"
 local function GetEnts(radius)
     local range
     if radius == nil then
