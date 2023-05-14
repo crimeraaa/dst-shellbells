@@ -1,6 +1,3 @@
-local mod_dir = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Don't Starve Together\\mods\\"
-package.path = mod_dir.."dst-015_ShellBellsRework\\scripts\\?.lua"
-
 local SectionsHelper = require("functions/sections_fns")
 local data = {}
 data.title = "malaguena"
