@@ -1,3 +1,6 @@
+local mod_dir = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Don't Starve Together\\mods\\"
+package.path = mod_dir.."dst-015_ShellBellsRework\\scripts\\?.lua"
+
 local SectionsHelper = require("functions/sections_fns")
 local data = {}
 data.title = "malaguena"
@@ -177,11 +180,9 @@ local ENDING = {
 data.notes = SectionsHelper.MakeSections(
     INTRO.MAIN, INTRO.VOLTA_1, 
     INTRO.MAIN, INTRO.VOLTA_2,
-    MAIN_A, MAIN_A,
-    MAIN_B, MAIN_B,
+    MAIN_A, MAIN_A, 
+    MAIN_B, MAIN_B, 
     ENDING
 )
-
--- SectionsHelper.CheckSections(data)
 
 return data

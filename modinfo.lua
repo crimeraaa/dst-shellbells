@@ -1,4 +1,4 @@
-local is_local = true
+local is_local = false
 local append = (is_local and " (Local)") or ""
 
 name = "Shell Bell Music"..append
