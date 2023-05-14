@@ -35,7 +35,7 @@ return data
 
 If you're unsure about your data.notes, try using:
 
-SectionsHelper.CheckSections(data)
+SectionsHelper.DumpSong(data)
 
 and check your client_log.txt to see the printout. 
 Make sure it's before the `return data` line though!
