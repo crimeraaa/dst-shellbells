@@ -3,7 +3,7 @@ local PITCHES = require("functions/pitches")
 local RHYTHMS = require("functions/rhythms")
 
 local MOD_PRETTYNAME = "[Shell Bell Music]: %s"
-local ERROR_MSG = "For song file '%s', we failed to convert %s \"%s\"!"..
+local ERROR_MSG = "For '%s', we failed to convert %s \"%s\"!"..
 "\nIt has %s \"%s\" located at data.notes index %d."
 
 local stringf = string.format

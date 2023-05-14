@@ -13,6 +13,12 @@ local function printf(fmt, ...)
     print(stringf(MOD_PRETTYNAME, msg))
 end
 
+-- Avoid running everything, don't want to compile all songs at the start menu
+if TheNet and not TheNet:GetIsServerAdmin() then
+    printf("You do not have admin permissions on this server. Returning.")
+    return
+end 
+
 -- Index this new global tables to access your songs
 MYSONGS = {} 
 local TimeVal = require("functions/to_timeval")
@@ -24,24 +30,9 @@ for i, data in pairs(songlist) do
     index your newly converted song from there ]]
 end 
 
---[[
-FORMAT:
-    c_shellsfromtable(MYSONGS.songname, startpos, placementfn, spacing_mult)
-EXAMPLE:
-    local here = Coords(90, 0, -300)
-    local dir = DIRECTION_FN.NW
-    local mult = 5
-    c_shellsfromtable(MYSONGS.whiplash_melody, here, dir, mult)
-]]
-
---[[ if TheNet and not TheNet:GetIsServerAdmin() then
-    printf("You do not have admin permissions on this server. Returning.")
-    return
-end ]]
-
--- STARTPOS FUNCTIONS
-
-function PlayerPos(num) 
+-- Startpos Stuff
+STARTPOS = {}
+STARTPOS.PLAYER = function(num) 
     local player = AllPlayers[num] or ThePlayer
     local coords = {}
     coords.x, coords.y, coords.z = player.Transform:GetWorldPosition()
@@ -49,7 +40,7 @@ function PlayerPos(num)
 end
 
 -- Quickly create a table of coordinates with x y z as the keys!
-function Coords(x,y,z) 
+STARTPOS.COORDS = function(x,y,z) 
     local coords = {}
     y = y or 0
     if (x == nil or z == nil) then 
@@ -61,7 +52,6 @@ function Coords(x,y,z)
 end
 
 -- Placement Fns
-
 local function MakeDirFn(x_mult, z_mult)
     local ret_fn = function(pos, mult)
         return Vector3(
@@ -74,33 +64,34 @@ local function MakeDirFn(x_mult, z_mult)
 end
 
 local mult = 1
-
-local N = MakeDirFn(-mult, mult)
-local NE = MakeDirFn(nil, -mult)
-local E = MakeDirFn(-mult, -mult)
-local SE = MakeDirFn(mult, nil)
-
-local S = MakeDirFn(mult, -mult)
-local SW = MakeDirFn(nil, mult)
-local W = MakeDirFn(mult, mult)
-local NW = MakeDirFn(-mult, nil)
-
-DIRECTION_FN = 
-{
-    N = N,          NE = NE, 
-    E = E,          SE = SE,
-    S = S,          SW = SW, 
-    W = W,          NW = NW,
-
-    -- Extra Keys, juuuust in case you want to use em
-
-    NORTH = N,      NORTHEAST = NE, 
-    EAST = E,       SOUTHEAST = SE, 
-    SOUTH = S,      SOUTHWEST = SW, 
-    WEST = W,       NORTHWEST = NW,
+local directional_fns = {
+    N = MakeDirFn(-mult, mult),
+    NE = MakeDirFn(nil, -mult),
+    E = MakeDirFn(-mult, -mult),
+    SE = MakeDirFn(mult, nil),
+    S = MakeDirFn(mult, -mult),
+    SW = MakeDirFn(nil, mult),
+    W = MakeDirFn(mult, mult),
+    NW = MakeDirFn(-mult, nil),
 }
 
--- EASE OF USE FUNCTIONS 
+directional_fns.__index = directional_fns
+
+local dir_list = {
+    NORTH = "N",        NORTHEAST = "NE",
+    EAST = "E",         SOUTHEAST = "SE",
+    SOUTH = "S",        SOUTHWEST = "SW",
+    WEST = "W",         NORTHWEST = "NW",
+}
+
+for k, v in pairs(dir_list) do
+    directional_fns[k] = directional_fns[v]
+end
+
+PLACEMENT_FN = {}
+_G.setmetatable(PLACEMENT_FN, directional_fns)
+
+-- Ease of use Fns
 
 local function GetShard()
     local shard = "this shard"
@@ -149,8 +140,8 @@ local function GetEnts(radius)
 
     local ents = TheSim:FindEntities(x,y,z, radius)
     range = stringf("in a '%d' unit radius", radius)
-    -- Radius is valid, so get entities in the given radius around the player
-    -- Return local entities table and range number
+    --[[ Radius is valid, so get entities in the given radius around the player
+    Return local entities table and range number ]]
     return ents, range
 end
 
@@ -164,7 +155,7 @@ local function GetShells(radius, remove)
     local shard = GetShard()
     local count = GetShellCount(ents, remove)
 
-    local msg = ""
+    local msg
     if range == nil then
         msg = stringf(success..".", shard, count)
     else
@@ -178,10 +169,23 @@ local function GetShells(radius, remove)
     printf(msg)
 end
 
-function ShellsRemove(radius)     -- this command is very robust. be careful with how you use it!        
-    GetShells(radius, true)     -- 2nd argument must be a boolean, see GetShells declaration above.
+-- this command is very robust. be careful with how you use it!        
+function ShellsRemove(radius)
+    -- 2nd argument must be a boolean, see GetShells declaration above. 
+    GetShells(radius, true)
 end
 
 function ShellsCount(radius)
     GetShells(radius)
 end
+
+-- Garbage
+MakeDirFn = nil
+mult = nil
+directional_fns = nil
+dir_list = nil
+
+-- Set up for garbage collection, you can't poke at these upvalues anyway
+TimeVal = nil
+songlist = nil
+
