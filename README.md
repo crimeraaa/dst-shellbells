@@ -49,7 +49,7 @@ In general Shell Bells are limited to the range of pitches `"C3"` up to `"B5"`. 
 
 Sharps can be writen like `"F#3"`. Flats can be written like `"Bb4"`. 
 
-`"E#"`, `"Fb"`, `"B#"` and `"Cb"` are also allowed. However, double sharps and double flats are not supported.
+`"E#"`, `"Fb"`, `"B#"` and `"Cb"` are also allowed. `Bbb4`, `F##5` and such are all valid as well.
 
 ### Rhythmic Durations
 

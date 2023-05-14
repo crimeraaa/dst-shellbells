@@ -40,10 +40,10 @@ STARTPOS.PLAYER = function(num)
 end
 
 -- Quickly create a table of coordinates with x y z as the keys!
-STARTPOS.COORDS = function(x,y,z) 
+STARTPOS.COORDS = function(x, y, z) 
     local coords = {}
     y = y or 0
-    if (x == nil or z == nil) then 
+    if x == nil or z == nil then 
         return nil 
     else
         coords.x, coords.y, coords.z = x, y, z 
