@@ -1,92 +1,97 @@
-local MOD_ENV = env
-local _G = GLOBAL
-_G.setfenv(1, _G) 
+_G = GLOBAL
+_G.setfenv(1, _G)
 
-local prettyname = "Shell Bell Music:"
-print(prettyname.." Begin compiling all songs!")
+-- For quicker compiler testing only
+--[[ local steamapps = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\"
+local dst_mods = steamapps.."Don't Starve Together\\mods\\"
+package.path = dst_mods.."dst-015_ShellBellsRework\\scripts\\?.lua" ]]
 
-mysongs = {}    -- instead of a million insividual global variables, index this new global table instead
-local TimeVal = MOD_ENV.require("functions/to_timeval")
-local songlist = MOD_ENV.require("songlist")
-for i, data in pairs(songlist) do
-    local transpose = data.transpose or 0 -- data.transpose can actually just be omitted if you don't need it.
-    _G.mysongs[data.title] = TimeVal(data.title, data.notes, transpose) 
-    -- immediately create a key the global table mysongs for your newly converted song 
-end 
-
-print(prettyname.." Done compiling all songs.")
-
---[[
-
-FORMAT:
-    c_shellsfromtable(mysongs.yoursongname, startpos, placementfn, spacing_mult)
-
-EXAMPLE:
-    local here = Coords(90, 0, -300)
-    local dir = NW
-    local mult = 5
-    c_shellsfromtable(mysongs.whiplash_melody, here, dir, mult)
-]]
-
-if TheNet and not TheNet:GetIsServerAdmin() then
-    print(prettyname.." You do not have admin permissions on this server. Returning.")
-    return
+local MOD_PRETTYNAME = "[Shell Bell Music]: %s"
+local stringf = string.format
+local function printf(fmt, ...)
+    local msg = stringf(fmt, ...)
+    print(stringf(MOD_PRETTYNAME, msg))
 end
 
--- STARTPOS FUNCTIONS
+-- Avoid running everything, don't want to compile all songs at the start menu
+if TheNet and not TheNet:GetIsServerAdmin() then
+    printf("You do not have admin permissions on this server. Returning.")
+    return
+end 
 
-function PlayerPos(num) 
+-- Index this new global tables to access your songs
+MYSONGS = {} 
+local TimeVal = require("functions/to_timeval")
+local songlist = require("songlist")
+
+for i, data in pairs(songlist) do
+    MYSONGS[data.title] = TimeVal(data.title, data.notes, data.transpose) 
+    --[[ immediately create a key the global table MYSONGS 
+    index your newly converted song from there ]]
+end 
+
+-- Startpos Stuff
+STARTPOS = {}
+STARTPOS.PLAYER = function(num) 
     local player = AllPlayers[num] or ThePlayer
     local coords = {}
     coords.x, coords.y, coords.z = player.Transform:GetWorldPosition()
     return coords
 end
 
-function Coords(x,y,z) -- quickly create a table of coordinates with x y z as the keys!
+-- Quickly create a table of coordinates with x y z as the keys!
+STARTPOS.COORDS = function(x,y,z) 
     local coords = {}
     y = y or 0
     if (x == nil or z == nil) then 
         return nil 
     else
-        coords.x, coords.y, coords.z = x,y,z 
+        coords.x, coords.y, coords.z = x, y, z 
         return coords
     end
 end
 
--- PLACEMENTFN DIRECTION FUNCTIONS
-
-N = function(pos, mult)
-    return Vector3(pos.x - 1 * mult, 0, pos.z + 1 * mult)
+-- Placement Fns
+local function MakeDirFn(x_mult, z_mult)
+    local ret_fn = function(pos, mult)
+        return Vector3(
+            pos.x + (mult * (x_mult or 0)), 
+            0,
+            pos.z + (mult * (z_mult or 0))
+        )
+    end
+    return ret_fn
 end
 
-NE = function(pos, mult) 
-    return Vector3(pos.x, 0, pos.z - 1 * mult)
+local mult = 1
+local directional_fns = {
+    N = MakeDirFn(-mult, mult),
+    NE = MakeDirFn(nil, -mult),
+    E = MakeDirFn(-mult, -mult),
+    SE = MakeDirFn(mult, nil),
+    S = MakeDirFn(mult, -mult),
+    SW = MakeDirFn(nil, mult),
+    W = MakeDirFn(mult, mult),
+    NW = MakeDirFn(-mult, nil),
+}
+
+directional_fns.__index = directional_fns
+
+local dir_list = {
+    NORTH = "N",        NORTHEAST = "NE",
+    EAST = "E",         SOUTHEAST = "SE",
+    SOUTH = "S",        SOUTHWEST = "SW",
+    WEST = "W",         NORTHWEST = "NW",
+}
+
+for k, v in pairs(dir_list) do
+    directional_fns[k] = directional_fns[v]
 end
 
-W = function(pos, mult)
-    return Vector3(pos.x + 1 * mult, 0, pos.z + 1 * mult)
-end
-NW = function(pos, mult) 
-    return Vector3(pos.x - 1 * mult, 0, pos.z)
-end
+PLACEMENT_FN = {}
+_G.setmetatable(PLACEMENT_FN, directional_fns)
 
-E = function(pos, mult)
-    return Vector3(pos.x - 1 * mult, 0, pos.z - 1 * mult )
-end
-
-SW = function(pos, mult) 
-    return Vector3(pos.x, 0, pos.z + 1 * mult)
-end
-
-S = function(pos, mult)
-    return Vector3(pos.x + 1 * mult, 0, pos.z - 1 * mult)
-end
-
-SE = function(pos, mult) 
-    return Vector3(pos.x + 1 * mult, 0, pos.z)
-end
-
--- EASE OF USE FUNCTIONS 
+-- Ease of use Fns
 
 local function GetShard()
     local shard = "this shard"
@@ -102,69 +107,85 @@ local function GetShard()
     return string.upper(shard)
 end
 
-local function GetShells(radius, remove)
-    local ents = {}
-    local range = nil
-    local invalid = prettyname.." Radius input '%s'"
-    local world = GetShard()
-
-    if radius == nil then
-        ents = Ents
-    else
-        if not (type(radius) == "number") then
-            radius = tostring(radius)
-            print(string.format(invalid.." is not a number value!", radius))
-            return
-        end
-        range = string.format("in a '%d' unit radius", radius)
-
-        local x,y,z = ThePlayer.Transform:GetWorldPosition()
-        ents = TheSim:FindEntities(x,y,z, radius)
-    end
-
+local shell = "singingshell_octave"
+local function GetShellCount(ents, remove)
     local count = 0
-    local shell = "singingshell_octave"
-    for k,v in pairs(ents) do
-        if (v.prefab == shell.."3") or (v.prefab == shell.."4") or (v.prefab == shell.."5") then
-            if remove == true then
-                v:Remove()
-            end
+    for _, entity in pairs(ents) do
+        if entity.prefab == shell.."3" or entity.prefab == shell.."4" 
+        or entity.prefab == shell.."5" then
+            if remove then entity:Remove() end
             count = count + 1
         end
     end
+    return count
+end
 
-    local success = prettyname.." %s - We found '%d' shell bells"
-    local msg = ""
-    if range == nil then
-        msg = string.format(success..".", world, count)
-    else
-        msg = string.format(success.." %s.", world, count, range)
+-- Given integer `radius`, returns 2 values: `ents` table and `range` string
+local invalid = "Radius input '%s'"
+local function GetEnts(radius)
+    local range
+    if radius == nil then
+        -- Return the Global Ents table with a nil range value
+        return Ents, nil
     end
 
-    if remove == true then
+    if type(radius) ~= "number" then
+        radius = tostring(radius)
+        printf(invalid.." is not a number value!", radius)
+        -- Invalid radius input, so return both nil to return the error 
+        return nil, nil
+    end
+    
+    local x,y,z = ThePlayer.Transform:GetWorldPosition()
+
+    local ents = TheSim:FindEntities(x,y,z, radius)
+    range = stringf("in a '%d' unit radius", radius)
+    --[[ Radius is valid, so get entities in the given radius around the player
+    Return local entities table and range number ]]
+    return ents, range
+end
+
+local success = "%s - We found '%d' shell bells"
+local function GetShells(radius, remove)
+    local ents, range = GetEnts(radius)
+    if ents == nil then
+        return 
+    end
+
+    local shard = GetShard()
+    local count = GetShellCount(ents, remove)
+
+    local msg
+    if range == nil then
+        msg = stringf(success..".", shard, count)
+    else
+        msg = stringf(success.." %s.", shard, count, range)
+    end
+
+    if remove then
         msg = string.gsub(msg, "found", "removed")
     end
 
-    print(msg)
-    return
+    printf(msg)
 end
 
-function ShellsRemove(radius)     -- this command is very robust. be careful with how you use it!        
-    GetShells(radius, true)     -- 2nd argument must be a boolean, see GetShells declaration above.
+-- this command is very robust. be careful with how you use it!        
+function ShellsRemove(radius)
+    -- 2nd argument must be a boolean, see GetShells declaration above. 
+    GetShells(radius, true)
 end
 
 function ShellsCount(radius)
     GetShells(radius)
 end
 
+-- Garbage
+MakeDirFn = nil
+mult = nil
+directional_fns = nil
+dir_list = nil
 
--- FOR MY TESTING WORLD ONLY, COMMENT OUT ON PUBLICATION
---[[
-HomeTime = function()
-    c_gonext("sewing_mannequin")
-    return
-end
+-- Set up for garbage collection, you can't poke at these upvalues anyway
+TimeVal = nil
+songlist = nil
 
-PlayFootstep = function()
-end
-]]
