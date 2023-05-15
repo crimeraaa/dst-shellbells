@@ -89,7 +89,7 @@ for k, v in pairs(dir_list) do
 end
 
 PLACEMENT_FN = {}
-_G.setmetatable(PLACEMENT_FN, directional_fns)
+setmetatable(PLACEMENT_FN, directional_fns)
 
 -- Ease of use Fns
 
