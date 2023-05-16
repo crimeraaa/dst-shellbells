@@ -64,32 +64,24 @@ local function MakeDirFn(x_mult, z_mult)
 end
 
 local mult = 1
-local directional_fns = {
-    N = MakeDirFn(-mult, mult),
-    NE = MakeDirFn(nil, -mult),
-    E = MakeDirFn(-mult, -mult),
-    SE = MakeDirFn(mult, nil),
-    S = MakeDirFn(mult, -mult),
-    SW = MakeDirFn(nil, mult),
-    W = MakeDirFn(mult, mult),
-    NW = MakeDirFn(-mult, nil),
+PLACEMENT_FN = {
+    N = MakeDirFn(-mult, mult),     NE = MakeDirFn(nil, -mult),
+    E = MakeDirFn(-mult, -mult),    SE = MakeDirFn(mult, nil),
+    S = MakeDirFn(mult, -mult),     SW = MakeDirFn(nil, mult),
+    W = MakeDirFn(mult, mult),      NW = MakeDirFn(-mult, nil),
 }
 
-directional_fns.__index = directional_fns
+-- Extra keys in case you'd like
 
-local dir_list = {
-    NORTH = "N",        NORTHEAST = "NE",
-    EAST = "E",         SOUTHEAST = "SE",
-    SOUTH = "S",        SOUTHWEST = "SW",
-    WEST = "W",         NORTHWEST = "NW",
-}
+PLACEMENT_FN.NORTH = PLACEMENT_FN.N
+PLACEMENT_FN.EAST = PLACEMENT_FN.E
+PLACEMENT_FN.SOUTH = PLACEMENT_FN.S
+PLACEMENT_FN.WEST = PLACEMENT_FN.W
 
-for k, v in pairs(dir_list) do
-    directional_fns[k] = directional_fns[v]
-end
-
-PLACEMENT_FN = {}
-setmetatable(PLACEMENT_FN, directional_fns)
+PLACEMENT_FN.NORTHEAST = PLACEMENT_FN.NE
+PLACEMENT_FN.SOUTHEAST = PLACEMENT_FN.SE
+PLACEMENT_FN.SOUTHWEST = PLACEMENT_FN.SW
+PLACEMENT_FN.NORTHWEST = PLACEMENT_FN.NW
 
 -- Ease of use Fns
 
@@ -111,9 +103,12 @@ local shell = "singingshell_octave"
 local function GetShellCount(ents, remove)
     local count = 0
     for _, entity in pairs(ents) do
-        if entity.prefab == shell.."3" or entity.prefab == shell.."4" 
+        if entity.prefab == shell.."3" 
+        or entity.prefab == shell.."4" 
         or entity.prefab == shell.."5" then
-            if remove then entity:Remove() end
+            if remove then 
+                entity:Remove() 
+            end
             count = count + 1
         end
     end
@@ -136,9 +131,9 @@ local function GetEnts(radius)
         return nil, nil
     end
     
-    local x,y,z = ThePlayer.Transform:GetWorldPosition()
+    local x, y, z = ThePlayer.Transform:GetWorldPosition()
 
-    local ents = TheSim:FindEntities(x,y,z, radius)
+    local ents = TheSim:FindEntities(x, y, z, radius)
     range = stringf("in a '%d' unit radius", radius)
     --[[ Radius is valid, so get entities in the given radius around the player
     Return local entities table and range number ]]
@@ -182,8 +177,6 @@ end
 -- Garbage
 MakeDirFn = nil
 mult = nil
-directional_fns = nil
-dir_list = nil
 
 -- Set up for garbage collection, you can't poke at these upvalues anyway
 TimeVal = nil

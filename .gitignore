@@ -38,3 +38,10 @@ luac.out
 *.i*86
 *.x86_64
 *.hex
+
+# The wiki directory
+dst-shellbells.wiki/
+
+# Ignore markdowns, but keep README.md
+*.md
+!README.md

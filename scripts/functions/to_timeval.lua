@@ -82,9 +82,12 @@ local function ConvertVals(mainfn, beat_num, note_tbl, error_count)
         return 
     end
     
-    local new_pitch = out_pitch + mainfn.transpose
-    local new_time = mainfn.offset
-    table.insert(mainfn.notes, { [1] = new_pitch, ["t"] = new_time })
+    table.insert(
+        mainfn.notes, { 
+            [1] = out_pitch + mainfn.transpose, 
+            ["t"] = mainfn.offset 
+        }
+    )
 
     --[[ Update mainfn.offset AFTER we set the song[index].t value
     This is so we effectively get the offset of the PREVIOUS note.
@@ -123,8 +126,11 @@ assuming 'origin' is set to the github repo,
 'experimental' is the name of the dev branch
 'main' is the name of this local working branch (i should clear that up)
 
-git push origin main:experimental
+git push origin main:(branch-name)
 
 If above doesn't work, clear any conflicts
 
-git pull origin experimental ]]
+git pull origin (branch-name) 
+
+omit (branch-name) if we're pushing directly to the repo's main,
+but that may be a bad thing to do ]]
