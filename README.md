@@ -3,7 +3,7 @@ A way to somewhat make writing shell bell songs in Don't Starve Together (DST) a
 
 ## tl;dr, just get to the point you nerd
 
-To install this mod, simply subscribe to it on the Steam Workshop (https://steamcommunity.com/sharedfiles/filedetails/?id=2949592573) or download it from here by clicking the green "Code" button and clicking "Download ZIP". If you download it from here, place and extract the ZIP file within your DST mods folder. For Windows 10, which is what I use, locally saved mods should be placed in `C:\Program Files (x86)\Steam\steamapps\common\Don't Starve Together\mods`.
+To install this mod, simply subscribe to it on the Steam Workshop (https://steamcommunity.com/sharedfiles/filedetails/?id=2949592573) or download it from here by clicking the green "Code" button and clicking "Download ZIP". If you download it from here, place and extract the ZIP file within your DST mods folder. For Windows 10, which is what I use, locally saved mods should be placed in `C:\Program Files (x86)\Steam\steamapps\common\Don't Starve Together\mods\`.
 
 Under `scripts/songs/My Songs/` (or any folder/subfolders of your choosing really, just make sure they begin at `scripts/songs/`) create a new Lua file with something along these lines:
 
@@ -29,7 +29,7 @@ return data
 ```
 > `data.title` is the variable name you want to call on later. 
 > 
-> `data.transpose` is how many semitones you want to tranpose all notes by. 
+> `data.transpose` is how many semitones you want to tranpose all notes by. You can set it to 0 or omit it.
 > 
 > `data.notes` is a table containing many subtables, each of these subtables contains your pitch information and rhythm duration information.
 
@@ -84,8 +84,7 @@ When you're done with making your song, go to `scripts/songlist.Lua` and declare
 ```Lua
 local directory = {}
 
-directory["My Songs"] =
-{
+directory["My Songs"] = {
 	"mysongfilename",
 }
 ```
@@ -126,4 +125,87 @@ c_shellsfromtable(MYSONGS.whiplash_bass, here, dir, mult)
 here.z = old + 1
 c_shellsfromtable(MYSONGS.whiplash_comp, here, dir ,mult)
 ```
+
+# Quick Reference
+
+The following are tables you can index ingame, provided the mod is enabled.
+
+## `MYSONGS`
+
+```Lua
+MYSONGS - { template, jazzlick, ... }
+```
+
+This table contains all your compiled song files. The keys are the values stored in each `data.title` field.
+
+## `STARTPOS`
+
+```Lua
+STARTPOS = {}
+STARTPOS.PLAYER = function(num) 
+    local player = AllPlayers[num] or ThePlayer
+    local coords = {}
+    coords.x, coords.y, coords.z = player.Transform:GetWorldPosition()
+    return coords
+end
+
+-- Quickly create a table of coordinates with x y z as the keys!
+STARTPOS.COORDS = function(x, y, z) 
+    local coords = {}
+    y = y or 0
+    if x == nil or z == nil then 
+        return nil 
+    else
+        coords.x, coords.y, coords.z = x, y, z 
+        return coords
+    end
+end
+```
+
+This table contains functions that return a table of `x, y, z` coordinates. To use these functions, *invoke* or *call* them directly.
+
+You can call `STARTPOS.PLAYER()` as is, without an input, and it will default to you. Input `num` must refer to a valid player number at the time the command is called. If the player number is invalid (that is, `nil`), then it will return your position instead. This is because of the `or` operator.
+
+`STARTPOS.COORDS(x, y, z)` requires those 3 inputs that represent their respective coordinates. In general, you can simply set `y` to 0 or `nil` as DST does not make much use of evelvation.
+
+## `PLACEMENT_FN`
+
+```Lua
+-- Placement Fns
+local function MakeDirFn(x_mult, z_mult)
+    local ret_fn = function(pos, mult)
+        return Vector3(
+            pos.x + (mult * (x_mult or 0)), 
+            0,
+            pos.z + (mult * (z_mult or 0))
+        )
+    end
+    return ret_fn
+end
+
+local mult = 1
+PLACEMENT_FN = {
+    N = MakeDirFn(-mult, mult),     NE = MakeDirFn(nil, -mult),
+    E = MakeDirFn(-mult, -mult),    SE = MakeDirFn(mult, nil),
+    S = MakeDirFn(mult, -mult),     SW = MakeDirFn(nil, mult),
+    W = MakeDirFn(mult, mult),      NW = MakeDirFn(-mult, nil),
+}
+
+-- Extra keys in case you'd like
+
+PLACEMENT_FN.NORTH = PLACEMENT_FN.N
+PLACEMENT_FN.EAST = PLACEMENT_FN.E
+PLACEMENT_FN.SOUTH = PLACEMENT_FN.S
+PLACEMENT_FN.WEST = PLACEMENT_FN.W
+
+PLACEMENT_FN.NORTHEAST = PLACEMENT_FN.NE
+PLACEMENT_FN.SOUTHEAST = PLACEMENT_FN.SE
+PLACEMENT_FN.SOUTHWEST = PLACEMENT_FN.SW
+PLACEMENT_FN.NORTHWEST = PLACEMENT_FN.NW
+```
+
+This table contains functions that set the direction in which your song is spawned. The default is North West (`PLACEMENT_FN.NW` or `PLACEMENT_FN.NORTHWEST`)
+
+Unlike the `STARTPOS` functions, you should not invoke or call them directly. Rather, pass the function as a variable.
+
 That should be everything in a nutshell. If you didn't fully understand something, please read this repository's Wiki.
